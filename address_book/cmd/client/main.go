@@ -3,7 +3,6 @@ package main
 import (
 	"addressbook/internal/pb"
 	"context"
-	"fmt"
 	"log"
 
 	"google.golang.org/grpc"
@@ -18,7 +17,7 @@ func main() {
 	defer conn.Close()
 	c := pb.NewAddressBookServiceClient(conn)
 
-	fmt.Println("AddContact block")
+	log.Println("AddContact block")
 	// AddContact
 	addResp, err := c.AddContact(ctx, &pb.AddContactRequest{
 		Contact: &pb.Contact{
@@ -30,7 +29,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(addResp.Msg)
+	log.Println(addResp.Msg)
 
 	addResp, err = c.AddContact(ctx, &pb.AddContactRequest{
 		Contact: &pb.Contact{
@@ -42,7 +41,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(addResp.Msg)
+	log.Println(addResp.Msg)
 
 	addResp, err = c.AddContact(ctx, &pb.AddContactRequest{
 		Contact: &pb.Contact{
@@ -54,9 +53,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(addResp.Msg)
+	log.Println(addResp.Msg)
 
-	fmt.Println("FindContact block")
+	log.Println("FindContact block")
 	// FindFindContactByName
 	findResp, err := c.FindContactByName(ctx, &pb.FindContactByNameRequest{
 		Name: "Alex",
@@ -65,7 +64,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(findResp.Contacts, findResp.Msg)
+	log.Println(findResp.Contacts, findResp.Msg)
 
 	// FindFindContactByPhone
 	findResp, err = c.FindContactByPhone(ctx, &pb.FindContactByPhoneRequest{
@@ -75,7 +74,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(findResp.Contacts, findResp.Msg)
+	log.Println(findResp.Contacts, findResp.Msg)
 
 	// FindFindContactByPhone as regular expression
 	findResp, err = c.FindContactByPhone(ctx, &pb.FindContactByPhoneRequest{
@@ -85,9 +84,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(findResp.Contacts, findResp.Msg)
+	log.Println(findResp.Contacts, findResp.Msg)
 
-	fmt.Println("DeleteContact block")
+	log.Println("DeleteContact block")
 	// DeleteContact
 	deleteResp, err := c.DeleteContact(ctx, &pb.DeleteContactRequest{
 		Phone: "89871111111",
@@ -96,7 +95,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(deleteResp.Msg)
+	log.Println(deleteResp.Msg)
 
 	deleteResp, err = c.DeleteContact(ctx, &pb.DeleteContactRequest{
 		Phone: "89871726755",
@@ -105,7 +104,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(deleteResp.Msg)
+	log.Println(deleteResp.Msg)
 
 	log.Println("UpdateContact block")
 	// UpdateContact
