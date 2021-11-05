@@ -106,4 +106,18 @@ func main() {
 		log.Fatal(err)
 	}
 	fmt.Println(deleteResp.Msg)
+
+	log.Println("UpdateContact block")
+	// UpdateContact
+	updateResp, err := c.UpdateContact(ctx, &pb.UpdateContactRequest{
+		Contact: &pb.Contact{
+			Name:    "AlexRyzhickov",
+			Phone:   "89111726755",
+			Address: "Nevsky Prospekt, 11",
+		},
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println(updateResp.Msg)
 }

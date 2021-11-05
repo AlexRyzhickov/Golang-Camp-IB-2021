@@ -9,6 +9,7 @@ service AddressBookService {
   rpc FindContactByName(FindContactByNameRequest) returns (FindContactResponse) {}
   rpc FindContactByPhone(FindContactByPhoneRequest) returns (FindContactResponse) {}
   rpc DeleteContact(DeleteContactRequest) returns (DeleteContactResponse) {}
+  rpc UpdateContact(UpdateContactRequest) returns (UpdateContactResponse){}
 }
 
 message Contact {
@@ -33,6 +34,10 @@ message DeleteContactRequest {
   string phone = 1;
 }
 
+message UpdateContactRequest {
+  Contact contact = 1;
+}
+
 message AddContactResponse {
   string msg = 1;
 }
@@ -43,5 +48,9 @@ message FindContactResponse {
 }
 
 message DeleteContactResponse {
+  string msg = 1;
+}
+
+message UpdateContactResponse {
   string msg = 1;
 }

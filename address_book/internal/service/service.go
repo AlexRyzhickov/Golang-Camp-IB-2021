@@ -14,6 +14,12 @@ type AddressBookService struct {
 }
 
 func (a *AddressBookService) AddContact(_ context.Context, in *pb.AddContactRequest) (*pb.AddContactResponse, error) {
+	if in == nil || in.Contact == nil {
+		return &pb.AddContactResponse{
+			Msg: "Contact has not been added",
+		}, nil
+	}
+
 	a.data.Store(in.Contact.Phone, in.Contact)
 
 	return &pb.AddContactResponse{
@@ -22,6 +28,12 @@ func (a *AddressBookService) AddContact(_ context.Context, in *pb.AddContactRequ
 }
 
 func (a *AddressBookService) FindContactByName(_ context.Context, in *pb.FindContactByNameRequest) (*pb.FindContactResponse, error) {
+	if in == nil {
+		return &pb.FindContactResponse{
+			Msg: "Contact has not been found",
+		}, nil
+	}
+
 	contacts := []*pb.Contact{}
 
 	a.data.Range(func(key interface{}, value interface{}) bool {
@@ -40,6 +52,12 @@ func (a *AddressBookService) FindContactByName(_ context.Context, in *pb.FindCon
 }
 
 func (a *AddressBookService) FindContactByPhone(_ context.Context, in *pb.FindContactByPhoneRequest) (*pb.FindContactResponse, error) {
+	if in == nil {
+		return &pb.FindContactResponse{
+			Msg: "Contact has not been found",
+		}, nil
+	}
+
 	matchString := in.Phone
 	contacts := []*pb.Contact{}
 
@@ -63,6 +81,12 @@ func (a *AddressBookService) FindContactByPhone(_ context.Context, in *pb.FindCo
 }
 
 func (a *AddressBookService) DeleteContact(_ context.Context, in *pb.DeleteContactRequest) (*pb.DeleteContactResponse, error) {
+	if in == nil {
+		return &pb.DeleteContactResponse{
+			Msg: "Contact has not been deleted",
+		}, nil
+	}
+
 	if _, ok := a.data.Load(in.Phone); !ok {
 		return &pb.DeleteContactResponse{
 			Msg: "Contact not found",
@@ -74,6 +98,21 @@ func (a *AddressBookService) DeleteContact(_ context.Context, in *pb.DeleteConta
 	return &pb.DeleteContactResponse{
 		Msg: "Contact deleted successfully",
 	}, nil
+}
+
+func (a *AddressBookService) UpdateContact(_ context.Context, in *pb.UpdateContactRequest) (*pb.UpdateContactResponse, error) {
+	if in == nil || in.Contact == nil {
+		return &pb.UpdateContactResponse{
+			Msg: "Contact has not been updated",
+		}, nil
+	}
+
+	a.data.Store(in.Contact.Phone, in.Contact)
+
+	return &pb.UpdateContactResponse{
+		Msg: "Contact updated successfully",
+	}, nil
+
 }
 
 func getFindContactMsg(size int) string {
