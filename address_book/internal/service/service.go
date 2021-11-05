@@ -107,6 +107,12 @@ func (a *AddressBookService) UpdateContact(_ context.Context, in *pb.UpdateConta
 		}, nil
 	}
 
+	if _, ok := a.data.Load(in.Contact.Phone); ok {
+		return &pb.UpdateContactResponse{
+			Msg: "Contact for update not found",
+		}, nil
+	}
+
 	a.data.Store(in.Contact.Phone, in.Contact)
 
 	return &pb.UpdateContactResponse{
