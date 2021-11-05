@@ -6,8 +6,7 @@ import "google/api/annotations.proto";
 
 service AddressBookService {
   rpc AddContact(AddContactRequest) returns (AddContactResponse) {}
-  rpc FindContactByName(FindContactByNameRequest) returns (FindContactResponse) {}
-  rpc FindContactByPhone(FindContactByPhoneRequest) returns (FindContactResponse) {}
+  rpc FindContact(FindContactRequest) returns (FindContactResponse) {}
   rpc DeleteContact(DeleteContactRequest) returns (DeleteContactResponse) {}
   rpc UpdateContact(UpdateContactRequest) returns (UpdateContactResponse){}
 }
@@ -22,12 +21,14 @@ message AddContactRequest {
   Contact contact = 1;
 }
 
-message FindContactByNameRequest {
-  string name = 1;
-}
+message FindContactRequest{
+  string query = 1;
+  SearchType searchType = 2;
 
-message FindContactByPhoneRequest {
-  string phone = 1;
+  enum SearchType {
+    NAME = 0;
+    PHONE = 1;
+  }
 }
 
 message DeleteContactRequest {

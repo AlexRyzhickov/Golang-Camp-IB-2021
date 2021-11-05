@@ -27,52 +27,45 @@ func (a *AddressBookService) AddContact(_ context.Context, in *pb.AddContactRequ
 	}, nil
 }
 
-func (a *AddressBookService) FindContactByName(_ context.Context, in *pb.FindContactByNameRequest) (*pb.FindContactResponse, error) {
-	if in == nil {
+func (a *AddressBookService) FindContact(_ context.Context, in *pb.FindContactRequest) (*pb.FindContactResponse, error) {
+	if in == nil || in.Query == "" {
 		return &pb.FindContactResponse{
-			Msg: "Contact has not been found",
+			Msg: "Empty query, contact has not been found",
 		}, nil
 	}
 
 	contacts := []*pb.Contact{}
 
-	a.data.Range(func(key interface{}, value interface{}) bool {
-		if contact, ok := value.(*pb.Contact); ok {
-			if contact.Name == in.Name {
-				contacts = append(contacts, contact)
-			}
-		}
-		return true
-	})
-
-	return &pb.FindContactResponse{
-		Contacts: contacts,
-		Msg:      getFindContactMsg(len(contacts)),
-	}, nil
-}
-
-func (a *AddressBookService) FindContactByPhone(_ context.Context, in *pb.FindContactByPhoneRequest) (*pb.FindContactResponse, error) {
-	if in == nil {
-		return &pb.FindContactResponse{
-			Msg: "Contact has not been found",
-		}, nil
-	}
-
-	matchString := in.Phone
-	contacts := []*pb.Contact{}
-
-	a.data.Range(func(key interface{}, value interface{}) bool {
-		if contact, ok := value.(*pb.Contact); ok {
-			matched, err := regexp.MatchString(matchString, contact.Phone)
-
-			if err == nil {
-				if matched {
+	switch in.SearchType {
+	case pb.FindContactRequest_NAME:
+		a.data.Range(func(key interface{}, value interface{}) bool {
+			if contact, ok := value.(*pb.Contact); ok {
+				if contact.Name == in.Query {
 					contacts = append(contacts, contact)
 				}
 			}
-		}
-		return true
-	})
+			return true
+		})
+	case pb.FindContactRequest_PHONE:
+		matchString := in.Query
+
+		a.data.Range(func(key interface{}, value interface{}) bool {
+			if contact, ok := value.(*pb.Contact); ok {
+				matched, err := regexp.MatchString(matchString, contact.Phone)
+
+				if err == nil {
+					if matched {
+						contacts = append(contacts, contact)
+					}
+				}
+			}
+			return true
+		})
+	default:
+		return &pb.FindContactResponse{
+			Msg: "Search value wrong",
+		}, nil
+	}
 
 	return &pb.FindContactResponse{
 		Contacts: contacts,
@@ -107,7 +100,7 @@ func (a *AddressBookService) UpdateContact(_ context.Context, in *pb.UpdateConta
 		}, nil
 	}
 
-	if _, ok := a.data.Load(in.Contact.Phone); ok {
+	if _, ok := a.data.Load(in.Contact.Phone); !ok {
 		return &pb.UpdateContactResponse{
 			Msg: "Contact for update not found",
 		}, nil

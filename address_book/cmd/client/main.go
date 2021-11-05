@@ -57,8 +57,9 @@ func main() {
 
 	log.Println("FindContact block")
 	// FindFindContactByName
-	findResp, err := c.FindContactByName(ctx, &pb.FindContactByNameRequest{
-		Name: "Alex",
+	findResp, err := c.FindContact(ctx, &pb.FindContactRequest{
+		Query:      "Alex",
+		SearchType: pb.FindContactRequest_NAME,
 	})
 
 	if err != nil {
@@ -67,8 +68,9 @@ func main() {
 	log.Println(findResp.Contacts, findResp.Msg)
 
 	// FindFindContactByPhone
-	findResp, err = c.FindContactByPhone(ctx, &pb.FindContactByPhoneRequest{
-		Phone: "89871726755",
+	findResp, err = c.FindContact(ctx, &pb.FindContactRequest{
+		Query:      "89871726755",
+		SearchType: pb.FindContactRequest_PHONE,
 	})
 
 	if err != nil {
@@ -77,8 +79,9 @@ func main() {
 	log.Println(findResp.Contacts, findResp.Msg)
 
 	// FindFindContactByPhone as regular expression
-	findResp, err = c.FindContactByPhone(ctx, &pb.FindContactByPhoneRequest{
-		Phone: "8987.......",
+	findResp, err = c.FindContact(ctx, &pb.FindContactRequest{
+		Query:      "8987.......",
+		SearchType: pb.FindContactRequest_PHONE,
 	})
 
 	if err != nil {

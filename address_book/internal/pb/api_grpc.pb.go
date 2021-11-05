@@ -19,8 +19,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AddressBookServiceClient interface {
 	AddContact(ctx context.Context, in *AddContactRequest, opts ...grpc.CallOption) (*AddContactResponse, error)
-	FindContactByName(ctx context.Context, in *FindContactByNameRequest, opts ...grpc.CallOption) (*FindContactResponse, error)
-	FindContactByPhone(ctx context.Context, in *FindContactByPhoneRequest, opts ...grpc.CallOption) (*FindContactResponse, error)
+	FindContact(ctx context.Context, in *FindContactRequest, opts ...grpc.CallOption) (*FindContactResponse, error)
 	DeleteContact(ctx context.Context, in *DeleteContactRequest, opts ...grpc.CallOption) (*DeleteContactResponse, error)
 	UpdateContact(ctx context.Context, in *UpdateContactRequest, opts ...grpc.CallOption) (*UpdateContactResponse, error)
 }
@@ -42,18 +41,9 @@ func (c *addressBookServiceClient) AddContact(ctx context.Context, in *AddContac
 	return out, nil
 }
 
-func (c *addressBookServiceClient) FindContactByName(ctx context.Context, in *FindContactByNameRequest, opts ...grpc.CallOption) (*FindContactResponse, error) {
+func (c *addressBookServiceClient) FindContact(ctx context.Context, in *FindContactRequest, opts ...grpc.CallOption) (*FindContactResponse, error) {
 	out := new(FindContactResponse)
-	err := c.cc.Invoke(ctx, "/pb.AddressBookService/FindContactByName", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *addressBookServiceClient) FindContactByPhone(ctx context.Context, in *FindContactByPhoneRequest, opts ...grpc.CallOption) (*FindContactResponse, error) {
-	out := new(FindContactResponse)
-	err := c.cc.Invoke(ctx, "/pb.AddressBookService/FindContactByPhone", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/pb.AddressBookService/FindContact", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -83,8 +73,7 @@ func (c *addressBookServiceClient) UpdateContact(ctx context.Context, in *Update
 // for forward compatibility
 type AddressBookServiceServer interface {
 	AddContact(context.Context, *AddContactRequest) (*AddContactResponse, error)
-	FindContactByName(context.Context, *FindContactByNameRequest) (*FindContactResponse, error)
-	FindContactByPhone(context.Context, *FindContactByPhoneRequest) (*FindContactResponse, error)
+	FindContact(context.Context, *FindContactRequest) (*FindContactResponse, error)
 	DeleteContact(context.Context, *DeleteContactRequest) (*DeleteContactResponse, error)
 	UpdateContact(context.Context, *UpdateContactRequest) (*UpdateContactResponse, error)
 	mustEmbedUnimplementedAddressBookServiceServer()
@@ -97,11 +86,8 @@ type UnimplementedAddressBookServiceServer struct {
 func (UnimplementedAddressBookServiceServer) AddContact(context.Context, *AddContactRequest) (*AddContactResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddContact not implemented")
 }
-func (UnimplementedAddressBookServiceServer) FindContactByName(context.Context, *FindContactByNameRequest) (*FindContactResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method FindContactByName not implemented")
-}
-func (UnimplementedAddressBookServiceServer) FindContactByPhone(context.Context, *FindContactByPhoneRequest) (*FindContactResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method FindContactByPhone not implemented")
+func (UnimplementedAddressBookServiceServer) FindContact(context.Context, *FindContactRequest) (*FindContactResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindContact not implemented")
 }
 func (UnimplementedAddressBookServiceServer) DeleteContact(context.Context, *DeleteContactRequest) (*DeleteContactResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteContact not implemented")
@@ -140,38 +126,20 @@ func _AddressBookService_AddContact_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AddressBookService_FindContactByName_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(FindContactByNameRequest)
+func _AddressBookService_FindContact_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FindContactRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AddressBookServiceServer).FindContactByName(ctx, in)
+		return srv.(AddressBookServiceServer).FindContact(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.AddressBookService/FindContactByName",
+		FullMethod: "/pb.AddressBookService/FindContact",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AddressBookServiceServer).FindContactByName(ctx, req.(*FindContactByNameRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _AddressBookService_FindContactByPhone_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(FindContactByPhoneRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AddressBookServiceServer).FindContactByPhone(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/pb.AddressBookService/FindContactByPhone",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AddressBookServiceServer).FindContactByPhone(ctx, req.(*FindContactByPhoneRequest))
+		return srv.(AddressBookServiceServer).FindContact(ctx, req.(*FindContactRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -224,12 +192,8 @@ var AddressBookService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _AddressBookService_AddContact_Handler,
 		},
 		{
-			MethodName: "FindContactByName",
-			Handler:    _AddressBookService_FindContactByName_Handler,
-		},
-		{
-			MethodName: "FindContactByPhone",
-			Handler:    _AddressBookService_FindContactByPhone_Handler,
+			MethodName: "FindContact",
+			Handler:    _AddressBookService_FindContact_Handler,
 		},
 		{
 			MethodName: "DeleteContact",

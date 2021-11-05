@@ -21,6 +21,52 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type FindContactRequest_SearchType int32
+
+const (
+	FindContactRequest_NAME  FindContactRequest_SearchType = 0
+	FindContactRequest_PHONE FindContactRequest_SearchType = 1
+)
+
+// Enum value maps for FindContactRequest_SearchType.
+var (
+	FindContactRequest_SearchType_name = map[int32]string{
+		0: "NAME",
+		1: "PHONE",
+	}
+	FindContactRequest_SearchType_value = map[string]int32{
+		"NAME":  0,
+		"PHONE": 1,
+	}
+)
+
+func (x FindContactRequest_SearchType) Enum() *FindContactRequest_SearchType {
+	p := new(FindContactRequest_SearchType)
+	*p = x
+	return p
+}
+
+func (x FindContactRequest_SearchType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (FindContactRequest_SearchType) Descriptor() protoreflect.EnumDescriptor {
+	return file_api_proto_enumTypes[0].Descriptor()
+}
+
+func (FindContactRequest_SearchType) Type() protoreflect.EnumType {
+	return &file_api_proto_enumTypes[0]
+}
+
+func (x FindContactRequest_SearchType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use FindContactRequest_SearchType.Descriptor instead.
+func (FindContactRequest_SearchType) EnumDescriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{2, 0}
+}
+
 type Contact struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -131,16 +177,17 @@ func (x *AddContactRequest) GetContact() *Contact {
 	return nil
 }
 
-type FindContactByNameRequest struct {
+type FindContactRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Query      string                        `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
+	SearchType FindContactRequest_SearchType `protobuf:"varint,2,opt,name=searchType,proto3,enum=pb.FindContactRequest_SearchType" json:"searchType,omitempty"`
 }
 
-func (x *FindContactByNameRequest) Reset() {
-	*x = FindContactByNameRequest{}
+func (x *FindContactRequest) Reset() {
+	*x = FindContactRequest{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_api_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -148,13 +195,13 @@ func (x *FindContactByNameRequest) Reset() {
 	}
 }
 
-func (x *FindContactByNameRequest) String() string {
+func (x *FindContactRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*FindContactByNameRequest) ProtoMessage() {}
+func (*FindContactRequest) ProtoMessage() {}
 
-func (x *FindContactByNameRequest) ProtoReflect() protoreflect.Message {
+func (x *FindContactRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_api_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -166,63 +213,23 @@ func (x *FindContactByNameRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use FindContactByNameRequest.ProtoReflect.Descriptor instead.
-func (*FindContactByNameRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use FindContactRequest.ProtoReflect.Descriptor instead.
+func (*FindContactRequest) Descriptor() ([]byte, []int) {
 	return file_api_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *FindContactByNameRequest) GetName() string {
+func (x *FindContactRequest) GetQuery() string {
 	if x != nil {
-		return x.Name
+		return x.Query
 	}
 	return ""
 }
 
-type FindContactByPhoneRequest struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Phone string `protobuf:"bytes,1,opt,name=phone,proto3" json:"phone,omitempty"`
-}
-
-func (x *FindContactByPhoneRequest) Reset() {
-	*x = FindContactByPhoneRequest{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_api_proto_msgTypes[3]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *FindContactByPhoneRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*FindContactByPhoneRequest) ProtoMessage() {}
-
-func (x *FindContactByPhoneRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[3]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use FindContactByPhoneRequest.ProtoReflect.Descriptor instead.
-func (*FindContactByPhoneRequest) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *FindContactByPhoneRequest) GetPhone() string {
+func (x *FindContactRequest) GetSearchType() FindContactRequest_SearchType {
 	if x != nil {
-		return x.Phone
+		return x.SearchType
 	}
-	return ""
+	return FindContactRequest_NAME
 }
 
 type DeleteContactRequest struct {
@@ -236,7 +243,7 @@ type DeleteContactRequest struct {
 func (x *DeleteContactRequest) Reset() {
 	*x = DeleteContactRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_api_proto_msgTypes[4]
+		mi := &file_api_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -249,7 +256,7 @@ func (x *DeleteContactRequest) String() string {
 func (*DeleteContactRequest) ProtoMessage() {}
 
 func (x *DeleteContactRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[4]
+	mi := &file_api_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -262,7 +269,7 @@ func (x *DeleteContactRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteContactRequest.ProtoReflect.Descriptor instead.
 func (*DeleteContactRequest) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{4}
+	return file_api_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *DeleteContactRequest) GetPhone() string {
@@ -283,7 +290,7 @@ type UpdateContactRequest struct {
 func (x *UpdateContactRequest) Reset() {
 	*x = UpdateContactRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_api_proto_msgTypes[5]
+		mi := &file_api_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -296,7 +303,7 @@ func (x *UpdateContactRequest) String() string {
 func (*UpdateContactRequest) ProtoMessage() {}
 
 func (x *UpdateContactRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[5]
+	mi := &file_api_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -309,7 +316,7 @@ func (x *UpdateContactRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateContactRequest.ProtoReflect.Descriptor instead.
 func (*UpdateContactRequest) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{5}
+	return file_api_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *UpdateContactRequest) GetContact() *Contact {
@@ -330,7 +337,7 @@ type AddContactResponse struct {
 func (x *AddContactResponse) Reset() {
 	*x = AddContactResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_api_proto_msgTypes[6]
+		mi := &file_api_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -343,7 +350,7 @@ func (x *AddContactResponse) String() string {
 func (*AddContactResponse) ProtoMessage() {}
 
 func (x *AddContactResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[6]
+	mi := &file_api_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -356,7 +363,7 @@ func (x *AddContactResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AddContactResponse.ProtoReflect.Descriptor instead.
 func (*AddContactResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{6}
+	return file_api_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *AddContactResponse) GetMsg() string {
@@ -378,7 +385,7 @@ type FindContactResponse struct {
 func (x *FindContactResponse) Reset() {
 	*x = FindContactResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_api_proto_msgTypes[7]
+		mi := &file_api_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -391,7 +398,7 @@ func (x *FindContactResponse) String() string {
 func (*FindContactResponse) ProtoMessage() {}
 
 func (x *FindContactResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[7]
+	mi := &file_api_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -404,7 +411,7 @@ func (x *FindContactResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FindContactResponse.ProtoReflect.Descriptor instead.
 func (*FindContactResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{7}
+	return file_api_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *FindContactResponse) GetContacts() []*Contact {
@@ -432,7 +439,7 @@ type DeleteContactResponse struct {
 func (x *DeleteContactResponse) Reset() {
 	*x = DeleteContactResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_api_proto_msgTypes[8]
+		mi := &file_api_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -445,7 +452,7 @@ func (x *DeleteContactResponse) String() string {
 func (*DeleteContactResponse) ProtoMessage() {}
 
 func (x *DeleteContactResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[8]
+	mi := &file_api_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -458,7 +465,7 @@ func (x *DeleteContactResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteContactResponse.ProtoReflect.Descriptor instead.
 func (*DeleteContactResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{8}
+	return file_api_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *DeleteContactResponse) GetMsg() string {
@@ -479,7 +486,7 @@ type UpdateContactResponse struct {
 func (x *UpdateContactResponse) Reset() {
 	*x = UpdateContactResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_api_proto_msgTypes[9]
+		mi := &file_api_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -492,7 +499,7 @@ func (x *UpdateContactResponse) String() string {
 func (*UpdateContactResponse) ProtoMessage() {}
 
 func (x *UpdateContactResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[9]
+	mi := &file_api_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -505,7 +512,7 @@ func (x *UpdateContactResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateContactResponse.ProtoReflect.Descriptor instead.
 func (*UpdateContactResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{9}
+	return file_api_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *UpdateContactResponse) GetMsg() string {
@@ -529,13 +536,16 @@ var file_api_proto_rawDesc = []byte{
 	0x41, 0x64, 0x64, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
 	0x74, 0x12, 0x25, 0x0a, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74, 0x18, 0x01, 0x20, 0x01,
 	0x28, 0x0b, 0x32, 0x0b, 0x2e, 0x70, 0x62, 0x2e, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74, 0x52,
-	0x07, 0x63, 0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74, 0x22, 0x2e, 0x0a, 0x18, 0x46, 0x69, 0x6e, 0x64,
-	0x43, 0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74, 0x42, 0x79, 0x4e, 0x61, 0x6d, 0x65, 0x52, 0x65, 0x71,
-	0x75, 0x65, 0x73, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x22, 0x31, 0x0a, 0x19, 0x46, 0x69, 0x6e, 0x64,
-	0x43, 0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74, 0x42, 0x79, 0x50, 0x68, 0x6f, 0x6e, 0x65, 0x52, 0x65,
-	0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x14, 0x0a, 0x05, 0x70, 0x68, 0x6f, 0x6e, 0x65, 0x18, 0x01,
-	0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x70, 0x68, 0x6f, 0x6e, 0x65, 0x22, 0x2c, 0x0a, 0x14, 0x44,
+	0x07, 0x63, 0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74, 0x22, 0x90, 0x01, 0x0a, 0x12, 0x46, 0x69, 0x6e,
+	0x64, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12,
+	0x14, 0x0a, 0x05, 0x71, 0x75, 0x65, 0x72, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05,
+	0x71, 0x75, 0x65, 0x72, 0x79, 0x12, 0x41, 0x0a, 0x0a, 0x73, 0x65, 0x61, 0x72, 0x63, 0x68, 0x54,
+	0x79, 0x70, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x21, 0x2e, 0x70, 0x62, 0x2e, 0x46,
+	0x69, 0x6e, 0x64, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x2e, 0x53, 0x65, 0x61, 0x72, 0x63, 0x68, 0x54, 0x79, 0x70, 0x65, 0x52, 0x0a, 0x73, 0x65,
+	0x61, 0x72, 0x63, 0x68, 0x54, 0x79, 0x70, 0x65, 0x22, 0x21, 0x0a, 0x0a, 0x53, 0x65, 0x61, 0x72,
+	0x63, 0x68, 0x54, 0x79, 0x70, 0x65, 0x12, 0x08, 0x0a, 0x04, 0x4e, 0x41, 0x4d, 0x45, 0x10, 0x00,
+	0x12, 0x09, 0x0a, 0x05, 0x50, 0x48, 0x4f, 0x4e, 0x45, 0x10, 0x01, 0x22, 0x2c, 0x0a, 0x14, 0x44,
 	0x65, 0x6c, 0x65, 0x74, 0x65, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74, 0x52, 0x65, 0x71, 0x75,
 	0x65, 0x73, 0x74, 0x12, 0x14, 0x0a, 0x05, 0x70, 0x68, 0x6f, 0x6e, 0x65, 0x18, 0x01, 0x20, 0x01,
 	0x28, 0x09, 0x52, 0x05, 0x70, 0x68, 0x6f, 0x6e, 0x65, 0x22, 0x3d, 0x0a, 0x14, 0x55, 0x70, 0x64,
@@ -555,33 +565,28 @@ var file_api_proto_rawDesc = []byte{
 	0x73, 0x67, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6d, 0x73, 0x67, 0x22, 0x29, 0x0a,
 	0x15, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74, 0x52, 0x65,
 	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x10, 0x0a, 0x03, 0x6d, 0x73, 0x67, 0x18, 0x01, 0x20,
-	0x01, 0x28, 0x09, 0x52, 0x03, 0x6d, 0x73, 0x67, 0x32, 0x81, 0x03, 0x0a, 0x12, 0x41, 0x64, 0x64,
+	0x01, 0x28, 0x09, 0x52, 0x03, 0x6d, 0x73, 0x67, 0x32, 0xa5, 0x02, 0x0a, 0x12, 0x41, 0x64, 0x64,
 	0x72, 0x65, 0x73, 0x73, 0x42, 0x6f, 0x6f, 0x6b, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12,
 	0x3d, 0x0a, 0x0a, 0x41, 0x64, 0x64, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74, 0x12, 0x15, 0x2e,
 	0x70, 0x62, 0x2e, 0x41, 0x64, 0x64, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74, 0x52, 0x65, 0x71,
 	0x75, 0x65, 0x73, 0x74, 0x1a, 0x16, 0x2e, 0x70, 0x62, 0x2e, 0x41, 0x64, 0x64, 0x43, 0x6f, 0x6e,
-	0x74, 0x61, 0x63, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x4c,
-	0x0a, 0x11, 0x46, 0x69, 0x6e, 0x64, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74, 0x42, 0x79, 0x4e,
-	0x61, 0x6d, 0x65, 0x12, 0x1c, 0x2e, 0x70, 0x62, 0x2e, 0x46, 0x69, 0x6e, 0x64, 0x43, 0x6f, 0x6e,
-	0x74, 0x61, 0x63, 0x74, 0x42, 0x79, 0x4e, 0x61, 0x6d, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
-	0x74, 0x1a, 0x17, 0x2e, 0x70, 0x62, 0x2e, 0x46, 0x69, 0x6e, 0x64, 0x43, 0x6f, 0x6e, 0x74, 0x61,
-	0x63, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x4e, 0x0a, 0x12,
-	0x46, 0x69, 0x6e, 0x64, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74, 0x42, 0x79, 0x50, 0x68, 0x6f,
-	0x6e, 0x65, 0x12, 0x1d, 0x2e, 0x70, 0x62, 0x2e, 0x46, 0x69, 0x6e, 0x64, 0x43, 0x6f, 0x6e, 0x74,
-	0x61, 0x63, 0x74, 0x42, 0x79, 0x50, 0x68, 0x6f, 0x6e, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
-	0x74, 0x1a, 0x17, 0x2e, 0x70, 0x62, 0x2e, 0x46, 0x69, 0x6e, 0x64, 0x43, 0x6f, 0x6e, 0x74, 0x61,
-	0x63, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x46, 0x0a, 0x0d,
-	0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74, 0x12, 0x18, 0x2e,
-	0x70, 0x62, 0x2e, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74,
-	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x19, 0x2e, 0x70, 0x62, 0x2e, 0x44, 0x65, 0x6c,
-	0x65, 0x74, 0x65, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
-	0x73, 0x65, 0x22, 0x00, 0x12, 0x46, 0x0a, 0x0d, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x43, 0x6f,
-	0x6e, 0x74, 0x61, 0x63, 0x74, 0x12, 0x18, 0x2e, 0x70, 0x62, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74,
-	0x65, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a,
-	0x19, 0x2e, 0x70, 0x62, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x43, 0x6f, 0x6e, 0x74, 0x61,
-	0x63, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x1a, 0x5a, 0x18,
-	0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x5f, 0x62, 0x6f, 0x6f, 0x6b, 0x2f, 0x69, 0x6e, 0x74,
-	0x65, 0x72, 0x6e, 0x61, 0x6c, 0x2f, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x74, 0x61, 0x63, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x40,
+	0x0a, 0x0b, 0x46, 0x69, 0x6e, 0x64, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74, 0x12, 0x16, 0x2e,
+	0x70, 0x62, 0x2e, 0x46, 0x69, 0x6e, 0x64, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x17, 0x2e, 0x70, 0x62, 0x2e, 0x46, 0x69, 0x6e, 0x64, 0x43,
+	0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00,
+	0x12, 0x46, 0x0a, 0x0d, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x63,
+	0x74, 0x12, 0x18, 0x2e, 0x70, 0x62, 0x2e, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x43, 0x6f, 0x6e,
+	0x74, 0x61, 0x63, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x19, 0x2e, 0x70, 0x62,
+	0x2e, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74, 0x52, 0x65,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x46, 0x0a, 0x0d, 0x55, 0x70, 0x64, 0x61,
+	0x74, 0x65, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74, 0x12, 0x18, 0x2e, 0x70, 0x62, 0x2e, 0x55,
+	0x70, 0x64, 0x61, 0x74, 0x65, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x1a, 0x19, 0x2e, 0x70, 0x62, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x43,
+	0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00,
+	0x42, 0x1a, 0x5a, 0x18, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x5f, 0x62, 0x6f, 0x6f, 0x6b,
+	0x2f, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x6e, 0x61, 0x6c, 0x2f, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -596,38 +601,38 @@ func file_api_proto_rawDescGZIP() []byte {
 	return file_api_proto_rawDescData
 }
 
-var file_api_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_api_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_api_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_api_proto_goTypes = []interface{}{
-	(*Contact)(nil),                   // 0: pb.Contact
-	(*AddContactRequest)(nil),         // 1: pb.AddContactRequest
-	(*FindContactByNameRequest)(nil),  // 2: pb.FindContactByNameRequest
-	(*FindContactByPhoneRequest)(nil), // 3: pb.FindContactByPhoneRequest
-	(*DeleteContactRequest)(nil),      // 4: pb.DeleteContactRequest
-	(*UpdateContactRequest)(nil),      // 5: pb.UpdateContactRequest
-	(*AddContactResponse)(nil),        // 6: pb.AddContactResponse
-	(*FindContactResponse)(nil),       // 7: pb.FindContactResponse
-	(*DeleteContactResponse)(nil),     // 8: pb.DeleteContactResponse
-	(*UpdateContactResponse)(nil),     // 9: pb.UpdateContactResponse
+	(FindContactRequest_SearchType)(0), // 0: pb.FindContactRequest.SearchType
+	(*Contact)(nil),                    // 1: pb.Contact
+	(*AddContactRequest)(nil),          // 2: pb.AddContactRequest
+	(*FindContactRequest)(nil),         // 3: pb.FindContactRequest
+	(*DeleteContactRequest)(nil),       // 4: pb.DeleteContactRequest
+	(*UpdateContactRequest)(nil),       // 5: pb.UpdateContactRequest
+	(*AddContactResponse)(nil),         // 6: pb.AddContactResponse
+	(*FindContactResponse)(nil),        // 7: pb.FindContactResponse
+	(*DeleteContactResponse)(nil),      // 8: pb.DeleteContactResponse
+	(*UpdateContactResponse)(nil),      // 9: pb.UpdateContactResponse
 }
 var file_api_proto_depIdxs = []int32{
-	0, // 0: pb.AddContactRequest.contact:type_name -> pb.Contact
-	0, // 1: pb.UpdateContactRequest.contact:type_name -> pb.Contact
-	0, // 2: pb.FindContactResponse.contacts:type_name -> pb.Contact
-	1, // 3: pb.AddressBookService.AddContact:input_type -> pb.AddContactRequest
-	2, // 4: pb.AddressBookService.FindContactByName:input_type -> pb.FindContactByNameRequest
-	3, // 5: pb.AddressBookService.FindContactByPhone:input_type -> pb.FindContactByPhoneRequest
+	1, // 0: pb.AddContactRequest.contact:type_name -> pb.Contact
+	0, // 1: pb.FindContactRequest.searchType:type_name -> pb.FindContactRequest.SearchType
+	1, // 2: pb.UpdateContactRequest.contact:type_name -> pb.Contact
+	1, // 3: pb.FindContactResponse.contacts:type_name -> pb.Contact
+	2, // 4: pb.AddressBookService.AddContact:input_type -> pb.AddContactRequest
+	3, // 5: pb.AddressBookService.FindContact:input_type -> pb.FindContactRequest
 	4, // 6: pb.AddressBookService.DeleteContact:input_type -> pb.DeleteContactRequest
 	5, // 7: pb.AddressBookService.UpdateContact:input_type -> pb.UpdateContactRequest
 	6, // 8: pb.AddressBookService.AddContact:output_type -> pb.AddContactResponse
-	7, // 9: pb.AddressBookService.FindContactByName:output_type -> pb.FindContactResponse
-	7, // 10: pb.AddressBookService.FindContactByPhone:output_type -> pb.FindContactResponse
-	8, // 11: pb.AddressBookService.DeleteContact:output_type -> pb.DeleteContactResponse
-	9, // 12: pb.AddressBookService.UpdateContact:output_type -> pb.UpdateContactResponse
-	8, // [8:13] is the sub-list for method output_type
-	3, // [3:8] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	7, // 9: pb.AddressBookService.FindContact:output_type -> pb.FindContactResponse
+	8, // 10: pb.AddressBookService.DeleteContact:output_type -> pb.DeleteContactResponse
+	9, // 11: pb.AddressBookService.UpdateContact:output_type -> pb.UpdateContactResponse
+	8, // [8:12] is the sub-list for method output_type
+	4, // [4:8] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_api_proto_init() }
@@ -661,7 +666,7 @@ func file_api_proto_init() {
 			}
 		}
 		file_api_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*FindContactByNameRequest); i {
+			switch v := v.(*FindContactRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -673,18 +678,6 @@ func file_api_proto_init() {
 			}
 		}
 		file_api_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*FindContactByPhoneRequest); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_api_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*DeleteContactRequest); i {
 			case 0:
 				return &v.state
@@ -696,7 +689,7 @@ func file_api_proto_init() {
 				return nil
 			}
 		}
-		file_api_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+		file_api_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*UpdateContactRequest); i {
 			case 0:
 				return &v.state
@@ -708,7 +701,7 @@ func file_api_proto_init() {
 				return nil
 			}
 		}
-		file_api_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+		file_api_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*AddContactResponse); i {
 			case 0:
 				return &v.state
@@ -720,7 +713,7 @@ func file_api_proto_init() {
 				return nil
 			}
 		}
-		file_api_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+		file_api_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*FindContactResponse); i {
 			case 0:
 				return &v.state
@@ -732,7 +725,7 @@ func file_api_proto_init() {
 				return nil
 			}
 		}
-		file_api_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+		file_api_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*DeleteContactResponse); i {
 			case 0:
 				return &v.state
@@ -744,7 +737,7 @@ func file_api_proto_init() {
 				return nil
 			}
 		}
-		file_api_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+		file_api_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*UpdateContactResponse); i {
 			case 0:
 				return &v.state
@@ -762,13 +755,14 @@ func file_api_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_api_proto_rawDesc,
-			NumEnums:      0,
-			NumMessages:   10,
+			NumEnums:      1,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_api_proto_goTypes,
 		DependencyIndexes: file_api_proto_depIdxs,
+		EnumInfos:         file_api_proto_enumTypes,
 		MessageInfos:      file_api_proto_msgTypes,
 	}.Build()
 	File_api_proto = out.File
