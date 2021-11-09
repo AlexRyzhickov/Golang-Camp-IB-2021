@@ -13,3 +13,16 @@ gen-proto: docker-build-generator
 		--grpc-gateway_out=. --grpc-gateway_opt=logtostderr=true --grpc-gateway_opt=paths=source_relative --grpc-gateway_opt=generate_unbound_methods=true \
 		-I /usr/local/include/. \
     	-I /api/. api.proto
+
+.PHONY: run-db
+run-db:
+	@docker run \
+		-d \
+		-v `pwd`/db:/docker-entrypoint-initdb.d/ \
+		--rm \
+		-p 5432:5432 \
+		--name db \
+		-e POSTGRES_DB=backend \
+		-e POSTGRES_USER=postgres \
+		-e POSTGRES_PASSWORD=postgres \
+		postgres:12
