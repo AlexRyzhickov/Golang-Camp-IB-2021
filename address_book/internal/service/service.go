@@ -76,18 +76,31 @@ func (a *AddressBookService) DeleteContact(_ context.Context, in *pb.DeleteConta
 		}, nil
 	}
 
-	/*if _, ok := a.data.Load(in.Phone); !ok {
+	var count int64 = 0
+	var user models.Contact
+	if err := a.db.Limit(1).Find(&user, in.Phone).Count(&count).Error; err != nil {
+		return &pb.DeleteContactResponse{
+			Msg: "delete error",
+		}, nil
+	}
+
+	err := a.db.Delete(&models.Contact{}, in.Phone).Error
+
+	if err != nil {
+		return &pb.DeleteContactResponse{
+			Msg: "delete error",
+		}, nil
+	}
+
+	if count == 0 {
 		return &pb.DeleteContactResponse{
 			Msg: "Contact not found",
 		}, nil
 	}
 
-	a.data.Delete(in.Phone)
-
 	return &pb.DeleteContactResponse{
 		Msg: "Contact deleted successfully",
-	}, nil*/
-	return &pb.DeleteContactResponse{}, nil
+	}, nil
 }
 
 func (a *AddressBookService) UpdateContact(_ context.Context, in *pb.UpdateContactRequest) (*pb.UpdateContactResponse, error) {
