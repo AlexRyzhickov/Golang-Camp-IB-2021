@@ -28,9 +28,10 @@ func main() {
 		},
 	})
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+	} else {
+		log.Println(addResp.Msg)
 	}
-	log.Println(addResp.Msg)
 
 	addResp, err = c.AddContact(ctx, &pb.AddContactRequest{
 		Contact: &pb.Contact{
@@ -40,9 +41,10 @@ func main() {
 		},
 	})
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+	} else {
+		log.Println(addResp.Msg)
 	}
-	log.Println(addResp.Msg)
 
 	addResp, err = c.AddContact(ctx, &pb.AddContactRequest{
 		Contact: &pb.Contact{
@@ -52,9 +54,10 @@ func main() {
 		},
 	})
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+	} else {
+		log.Println(addResp.Msg)
 	}
-	log.Println(addResp.Msg)
 
 	log.Println("FindContact block")
 	// FindFindContactByName
@@ -81,7 +84,7 @@ func main() {
 
 	// FindFindContactByPhone as wildcards
 	findResp, err = c.FindContact(ctx, &pb.FindContactRequest{
-		Query:      "8987???????",
+		Query:      "8987_______",
 		SearchType: pb.FindContactRequest_PHONE,
 	})
 
@@ -92,7 +95,7 @@ func main() {
 
 	// FindFindContactByPhone as wildcards
 	findResp, err = c.FindContact(ctx, &pb.FindContactRequest{
-		Query:      "8987*",
+		Query:      "8987%",
 		SearchType: pb.FindContactRequest_PHONE,
 	})
 
@@ -101,37 +104,37 @@ func main() {
 	}
 	log.Println(findResp.Contacts, findResp.Msg)
 
-	log.Println("DeleteContact block")
-	// DeleteContact
-	deleteResp, err := c.DeleteContact(ctx, &pb.DeleteContactRequest{
-		Phone: "89871111111",
-	})
+	/*	log.Println("DeleteContact block")
+		// DeleteContact
+		deleteResp, err := c.DeleteContact(ctx, &pb.DeleteContactRequest{
+			Phone: "89871111111",
+		})
 
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Println(deleteResp.Msg)
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Println(deleteResp.Msg)
 
-	deleteResp, err = c.DeleteContact(ctx, &pb.DeleteContactRequest{
-		Phone: "89871726755",
-	})
+		deleteResp, err = c.DeleteContact(ctx, &pb.DeleteContactRequest{
+			Phone: "89871726755",
+		})
 
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Println(deleteResp.Msg)
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Println(deleteResp.Msg)
 
-	log.Println("UpdateContact block")
-	// UpdateContact
-	updateResp, err := c.UpdateContact(ctx, &pb.UpdateContactRequest{
-		Contact: &pb.Contact{
-			Name:    "AlexRyzhickov",
-			Phone:   "89111726755",
-			Address: "Nevsky Prospekt, 11",
-		},
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Println(updateResp.Msg)
+		log.Println("UpdateContact block")
+		// UpdateContact
+		updateResp, err := c.UpdateContact(ctx, &pb.UpdateContactRequest{
+			Contact: &pb.Contact{
+				Name:    "AlexRyzhickov",
+				Phone:   "89111726755",
+				Address: "Nevsky Prospekt, 11",
+			},
+		})
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Println(updateResp.Msg)*/
 }

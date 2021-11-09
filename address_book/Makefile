@@ -18,7 +18,6 @@ gen-proto: docker-build-generator
 run-db:
 	@docker run \
 		-d \
-		-v `pwd`/db:/docker-entrypoint-initdb.d/ \
 		--rm \
 		-p 5432:5432 \
 		--name db \

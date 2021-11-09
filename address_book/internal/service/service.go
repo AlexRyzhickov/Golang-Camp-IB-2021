@@ -1,40 +1,49 @@
 package service
 
 import (
+	models "addressbook/internal/model"
 	"addressbook/internal/pb"
 	"context"
-	"database/sql"
 	"fmt"
-	"sync"
+	"gorm.io/gorm"
+	"log"
 )
 
 type AddressBookService struct {
 	pb.AddressBookServiceServer
-	data sync.Map
-	db   *sql.DB
+	db *gorm.DB
 }
 
-func NewAddressBookService(db *sql.DB) *AddressBookService {
+func NewAddressBookService(db *gorm.DB) *AddressBookService {
 	return &AddressBookService{db: db}
 }
 
 func (a *AddressBookService) AddContact(_ context.Context, in *pb.AddContactRequest) (*pb.AddContactResponse, error) {
-	/*if in == nil || in.Contact == nil {
+	if in == nil || in.Contact == nil {
 		return &pb.AddContactResponse{
 			Msg: "Contact has not been added",
 		}, nil
 	}
 
-	a.data.Store(in.Contact.Phone, in.Contact)
+	err := a.db.Create(&models.Contact{
+		Phone:   in.Contact.Phone,
+		Name:    in.Contact.Name,
+		Address: in.Contact.Address,
+	}).Error
+
+	if err != nil {
+		return &pb.AddContactResponse{
+			Msg: "Сontact has already been added",
+		}, err
+	}
 
 	return &pb.AddContactResponse{
 		Msg: "Contact added successfully",
-	}, nil*/
-	return &pb.AddContactResponse{}, nil
+	}, nil
 }
 
 func (a *AddressBookService) FindContact(_ context.Context, in *pb.FindContactRequest) (*pb.FindContactResponse, error) {
-	/*if in == nil || in.Query == "" {
+	if in == nil || in.Query == "" {
 		return &pb.FindContactResponse{
 			Msg: "Empty query, contact has not been found",
 		}, nil
@@ -44,30 +53,33 @@ func (a *AddressBookService) FindContact(_ context.Context, in *pb.FindContactRe
 
 	switch in.SearchType {
 	case pb.FindContactRequest_NAME:
-		a.data.Range(func(key interface{}, value interface{}) bool {
-			if contact, ok := value.(*pb.Contact); ok {
-				if contact.Name == in.Query {
-					contacts = append(contacts, contact)
-				}
-			}
-			return true
-		})
+
+		findContacts := []models.Contact{}
+
+		a.db.Where("name = ?", in.Query).Find(&findContacts)
+		log.Println(findContacts)
+
+		for _, contact := range findContacts {
+			contacts = append(contacts, &pb.Contact{
+				Phone:   contact.Phone,
+				Name:    contact.Name,
+				Address: contact.Address,
+			})
+		}
+
 	case pb.FindContactRequest_PHONE:
-		matchString := in.Query
+		findContacts := []models.Contact{}
 
-		a.data.Range(func(key interface{}, value interface{}) bool {
-			if contact, ok := value.(*pb.Contact); ok {
-				matchString := strings.ReplaceAll(matchString, "?", ".")
-				matched, err := regexp.MatchString(matchString, contact.Phone)
+		a.db.Where("phone LIKE ?", in.Query).Find(&findContacts)
+		log.Println(findContacts)
 
-				if err == nil {
-					if matched {
-						contacts = append(contacts, contact)
-					}
-				}
-			}
-			return true
-		})
+		for _, contact := range findContacts {
+			contacts = append(contacts, &pb.Contact{
+				Phone:   contact.Phone,
+				Name:    contact.Name,
+				Address: contact.Address,
+			})
+		}
 	default:
 		return &pb.FindContactResponse{
 			Msg: "Search value wrong",
@@ -77,19 +89,17 @@ func (a *AddressBookService) FindContact(_ context.Context, in *pb.FindContactRe
 	return &pb.FindContactResponse{
 		Contacts: contacts,
 		Msg:      getFindContactMsg(len(contacts)),
-	}, nil*/
-
-	return &pb.FindContactResponse{}, nil
+	}, nil
 }
 
 func (a *AddressBookService) DeleteContact(_ context.Context, in *pb.DeleteContactRequest) (*pb.DeleteContactResponse, error) {
-	/*if in == nil {
+	if in == nil {
 		return &pb.DeleteContactResponse{
 			Msg: "Contact has not been deleted",
 		}, nil
 	}
 
-	if _, ok := a.data.Load(in.Phone); !ok {
+	/*if _, ok := a.data.Load(in.Phone); !ok {
 		return &pb.DeleteContactResponse{
 			Msg: "Contact not found",
 		}, nil
@@ -104,24 +114,23 @@ func (a *AddressBookService) DeleteContact(_ context.Context, in *pb.DeleteConta
 }
 
 func (a *AddressBookService) UpdateContact(_ context.Context, in *pb.UpdateContactRequest) (*pb.UpdateContactResponse, error) {
-	/*if in == nil || in.Contact == nil {
+	if in == nil || in.Contact == nil {
 		return &pb.UpdateContactResponse{
 			Msg: "Contact has not been updated",
 		}, nil
 	}
 
-	if _, ok := a.data.Load(in.Contact.Phone); !ok {
+	/*if _, ok := a.data.Load(in.Contact.Phone); !ok {
 		return &pb.UpdateContactResponse{
 			Msg: "Contact for update not found",
 		}, nil
 	}
 
-	a.data.Store(in.Contact.Phone, in.Contact)
+	a.data.Store(in.Contact.Phone, in.Contact)*/
 
 	return &pb.UpdateContactResponse{
 		Msg: "Contact updated successfully",
-	}, nil*/
-	return &pb.UpdateContactResponse{}, nil
+	}, nil
 }
 
 func getFindContactMsg(size int) string {

@@ -1,17 +1,37 @@
 package main
 
 import (
+	models "addressbook/internal/model"
 	"addressbook/internal/pb"
 	"addressbook/internal/service"
-	"database/sql"
-	_ "github.com/lib/pq"
 	"google.golang.org/grpc"
+	//"database/sql"
+	//_ "github.com/lib/pq"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 	"log"
 	"net"
 	"os"
 )
 
-const DBConnString = "postgres://postgres:postgres@127.0.0.1:5432/backend?sslmode=disable"
+func connectDB() (*gorm.DB, error) {
+	dsn := "host=localhost user=postgres password=postgres dbname=backend port=5432 sslmode=disable"
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		return nil, err
+	}
+	return db, nil
+}
+
+func initializeDB(db *gorm.DB) error {
+	if isInit := db.Migrator().HasTable(&models.Contact{}); !isInit {
+		err := db.Migrator().CreateTable(&models.Contact{})
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
 
 func main() {
 
@@ -21,15 +41,12 @@ func main() {
 	}
 	s := grpc.NewServer()
 
-	db, err := sql.Open("postgres", DBConnString)
+	db, err := connectDB()
 	if err != nil {
-		log.Fatal("DB initializing error", err)
+		log.Fatal("failed to connect database", err)
 	}
-	defer db.Close()
-
-	err = db.Ping()
-	if err != nil {
-		log.Fatal("DB pinging error", err)
+	if err = initializeDB(db); err != nil {
+		log.Fatal("failed to init `contact` table", err)
 	}
 
 	pb.RegisterAddressBookServiceServer(s, service.NewAddressBookService(db))
