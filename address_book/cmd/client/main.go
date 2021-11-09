@@ -79,9 +79,20 @@ func main() {
 	}
 	log.Println(findResp.Contacts, findResp.Msg)
 
-	// FindFindContactByPhone as regular expression
+	// FindFindContactByPhone as wildcards
 	findResp, err = c.FindContact(ctx, &pb.FindContactRequest{
-		Query:      "8987.......",
+		Query:      "8987???????",
+		SearchType: pb.FindContactRequest_PHONE,
+	})
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println(findResp.Contacts, findResp.Msg)
+
+	// FindFindContactByPhone as wildcards
+	findResp, err = c.FindContact(ctx, &pb.FindContactRequest{
+		Query:      "8987*",
 		SearchType: pb.FindContactRequest_PHONE,
 	})
 

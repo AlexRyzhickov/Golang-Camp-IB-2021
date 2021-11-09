@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"regexp"
+	"strings"
 	"sync"
 )
 
@@ -51,6 +52,7 @@ func (a *AddressBookService) FindContact(_ context.Context, in *pb.FindContactRe
 
 		a.data.Range(func(key interface{}, value interface{}) bool {
 			if contact, ok := value.(*pb.Contact); ok {
+				matchString := strings.ReplaceAll(matchString, "?", ".")
 				matched, err := regexp.MatchString(matchString, contact.Phone)
 
 				if err == nil {
