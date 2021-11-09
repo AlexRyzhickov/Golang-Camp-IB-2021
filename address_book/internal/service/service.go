@@ -48,57 +48,25 @@ func (a *AddressBookService) FindContact(_ context.Context, in *pb.FindContactRe
 		}, nil
 	}
 
-	contacts := []*pb.Contact{}
-
 	switch in.SearchType {
 	case pb.FindContactRequest_NAME:
-
 		findContacts := []models.Contact{}
 
 		err := a.db.Where("name = ?", in.Query).Find(&findContacts).Error
 
-		if err != nil {
-			return &pb.FindContactResponse{
-				Msg: "search error",
-			}, err
-		}
-
-		for _, contact := range findContacts {
-			contacts = append(contacts, &pb.Contact{
-				Phone:   contact.Phone,
-				Name:    contact.Name,
-				Address: contact.Address,
-			})
-		}
+		return processFindContact(&findContacts, err)
 
 	case pb.FindContactRequest_PHONE:
 		findContacts := []models.Contact{}
 
 		err := a.db.Where("phone LIKE ?", in.Query).Find(&findContacts).Error
 
-		if err != nil {
-			return &pb.FindContactResponse{
-				Msg: "search error",
-			}, err
-		}
-
-		for _, contact := range findContacts {
-			contacts = append(contacts, &pb.Contact{
-				Phone:   contact.Phone,
-				Name:    contact.Name,
-				Address: contact.Address,
-			})
-		}
+		return processFindContact(&findContacts, err)
 	default:
 		return &pb.FindContactResponse{
 			Msg: "Search value wrong",
 		}, nil
 	}
-
-	return &pb.FindContactResponse{
-		Contacts: contacts,
-		Msg:      getFindContactMsg(len(contacts)),
-	}, nil
 }
 
 func (a *AddressBookService) DeleteContact(_ context.Context, in *pb.DeleteContactRequest) (*pb.DeleteContactResponse, error) {
@@ -150,4 +118,27 @@ func getFindContactMsg(size int) string {
 		return fmt.Sprintf("Contacts were found successfully, number of contacts: %v", size)
 	}
 	return "No contacts were found"
+}
+
+func processFindContact(findContacts *[]models.Contact, err error) (*pb.FindContactResponse, error) {
+	if err != nil {
+		return &pb.FindContactResponse{
+			Msg: "search error",
+		}, err
+	}
+
+	contacts := []*pb.Contact{}
+
+	for _, contact := range *findContacts {
+		contacts = append(contacts, &pb.Contact{
+			Phone:   contact.Phone,
+			Name:    contact.Name,
+			Address: contact.Address,
+		})
+	}
+
+	return &pb.FindContactResponse{
+		Contacts: contacts,
+		Msg:      getFindContactMsg(len(contacts)),
+	}, nil
 }
