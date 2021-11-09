@@ -97,13 +97,19 @@ func (a *AddressBookService) UpdateContact(_ context.Context, in *pb.UpdateConta
 		}, nil
 	}
 
-	/*if _, ok := a.data.Load(in.Contact.Phone); !ok {
-		return &pb.UpdateContactResponse{
-			Msg: "Contact for update not found",
-		}, nil
+	contact := models.Contact{
+		Phone:   in.Contact.Phone,
+		Name:    in.Contact.Name,
+		Address: in.Contact.Address,
 	}
 
-	a.data.Store(in.Contact.Phone, in.Contact)*/
+	err := a.db.Model(&contact).Updates(models.Contact{Phone: contact.Phone, Name: contact.Name, Address: contact.Address}).Error
+
+	if err != nil {
+		return &pb.UpdateContactResponse{
+			Msg: "update error",
+		}, nil
+	}
 
 	return &pb.UpdateContactResponse{
 		Msg: "Contact updated successfully",
