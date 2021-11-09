@@ -5,13 +5,14 @@ import (
 	"addressbook/internal/service"
 	"log"
 	"net"
+	"os"
 
 	"google.golang.org/grpc"
 )
 
 func main() {
 
-	lis, err := net.Listen("tcp", ":8080")
+	lis, err := net.Listen("tcp", ":"+os.Getenv("PORT"))
 	if err != nil {
 		log.Fatal(err)
 	}

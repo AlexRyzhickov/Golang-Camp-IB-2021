@@ -4,13 +4,14 @@ import (
 	"addressbook/internal/pb"
 	"context"
 	"log"
+	"os"
 
 	"google.golang.org/grpc"
 )
 
 func main() {
 	ctx := context.Background()
-	conn, err := grpc.Dial(":8080", grpc.WithInsecure(), grpc.WithBlock())
+	conn, err := grpc.Dial(":"+os.Getenv("PORT"), grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		log.Fatalf("\nDid not connect %v\n", err)
 	}
