@@ -6,7 +6,6 @@ import (
 	"context"
 	"fmt"
 	"gorm.io/gorm"
-	"log"
 )
 
 type AddressBookService struct {
@@ -56,8 +55,13 @@ func (a *AddressBookService) FindContact(_ context.Context, in *pb.FindContactRe
 
 		findContacts := []models.Contact{}
 
-		a.db.Where("name = ?", in.Query).Find(&findContacts)
-		log.Println(findContacts)
+		err := a.db.Where("name = ?", in.Query).Find(&findContacts).Error
+
+		if err != nil {
+			return &pb.FindContactResponse{
+				Msg: "search error",
+			}, err
+		}
 
 		for _, contact := range findContacts {
 			contacts = append(contacts, &pb.Contact{
@@ -70,8 +74,13 @@ func (a *AddressBookService) FindContact(_ context.Context, in *pb.FindContactRe
 	case pb.FindContactRequest_PHONE:
 		findContacts := []models.Contact{}
 
-		a.db.Where("phone LIKE ?", in.Query).Find(&findContacts)
-		log.Println(findContacts)
+		err := a.db.Where("phone LIKE ?", in.Query).Find(&findContacts).Error
+
+		if err != nil {
+			return &pb.FindContactResponse{
+				Msg: "search error",
+			}, err
+		}
 
 		for _, contact := range findContacts {
 			contacts = append(contacts, &pb.Contact{
