@@ -4,18 +4,19 @@ import (
 	models "addressbook/internal/model"
 	"addressbook/internal/pb"
 	"addressbook/internal/service"
-	"google.golang.org/grpc"
-	//"database/sql"
-	//_ "github.com/lib/pq"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 	"log"
 	"net"
 	"os"
+
+	"google.golang.org/grpc"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
+const dsn = "host=localhost user=postgres password=postgres dbname=backend port=5432 sslmode=disable"
+
 func connectDB() (*gorm.DB, error) {
-	dsn := "host=localhost user=postgres password=postgres dbname=backend port=5432 sslmode=disable"
+	dsn := dsn
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		return nil, err

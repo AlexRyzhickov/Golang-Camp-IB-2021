@@ -68,7 +68,6 @@ func (a *AddressBookService) FindContact(_ context.Context, in *pb.FindContactRe
 		err := a.db.Where("name = ?", in.Query).Find(&findContacts).Error
 
 		return processFindContact(&findContacts, err)
-
 	case pb.FindContactRequest_PHONE:
 		findContacts := []models.Contact{}
 
