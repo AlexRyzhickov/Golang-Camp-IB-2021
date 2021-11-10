@@ -1,25 +1,23 @@
 package main
 
 import (
+	"addressbook/cmd/config"
 	models "addressbook/internal/model"
 	"addressbook/internal/pb"
 	"addressbook/internal/service"
 	"log"
 	"net"
-	"os"
 
 	"google.golang.org/grpc"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-const dsn = "postgres://postgres:postgres@db/backend?sslmode=disable"
+//const dsn = "postgres://postgres:postgres@db/backend?sslmode=disable"
+//const dsn = "localhost user=postgres password=postgres dbname=backend port=5432 sslmode=disable"
 
-//const dsn = "postgres://postgres:postgres@db user=postgres password=postgres dbname=backend port=5432 sslmode=disable"
-
-func connectDB() (*gorm.DB, error) {
-	dsn := dsn
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+func connectDB(cfg *config.Config) (*gorm.DB, error) {
+	db, err := gorm.Open(postgres.Open(cfg.DBConn), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}
@@ -37,14 +35,18 @@ func initializeDB(db *gorm.DB) error {
 }
 
 func main() {
+	cfg, err := config.New()
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	lis, err := net.Listen("tcp", ":"+os.Getenv("PORT"))
+	lis, err := net.Listen("tcp", ":"+cfg.Port)
 	if err != nil {
 		log.Fatal(err)
 	}
 	s := grpc.NewServer()
 
-	db, err := connectDB()
+	db, err := connectDB(cfg)
 	if err != nil {
 		log.Fatal("failed to connect database", err)
 	}
