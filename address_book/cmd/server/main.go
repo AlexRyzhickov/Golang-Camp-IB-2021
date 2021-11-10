@@ -13,7 +13,9 @@ import (
 	"gorm.io/gorm"
 )
 
-const dsn = "host=localhost user=postgres password=postgres dbname=backend port=5432 sslmode=disable"
+const dsn = "postgres://postgres:postgres@db/backend?sslmode=disable"
+
+//const dsn = "postgres://postgres:postgres@db user=postgres password=postgres dbname=backend port=5432 sslmode=disable"
 
 func connectDB() (*gorm.DB, error) {
 	dsn := dsn
