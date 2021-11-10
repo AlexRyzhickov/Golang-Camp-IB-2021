@@ -13,9 +13,6 @@ import (
 	"gorm.io/gorm"
 )
 
-//const dsn = "postgres://postgres:postgres@db/backend?sslmode=disable"
-//const dsn = "localhost user=postgres password=postgres dbname=backend port=5432 sslmode=disable"
-
 func connectDB(cfg *config.Config) (*gorm.DB, error) {
 	db, err := gorm.Open(postgres.Open(cfg.DBConn), &gorm.Config{})
 	if err != nil {
