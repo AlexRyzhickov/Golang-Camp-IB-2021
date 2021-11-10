@@ -88,19 +88,6 @@ func (a *AddressBookService) DeleteContact(_ context.Context, in *pb.DeleteConta
 		}, nil
 	}
 
-	var count int64 = 0
-	if err := a.db.Limit(1).Find(&models.Contact{}, in.Phone).Count(&count).Error; err != nil {
-		return &pb.DeleteContactResponse{
-			Msg: "delete error",
-		}, nil
-	}
-
-	if count == 0 {
-		return &pb.DeleteContactResponse{
-			Msg: "Contact not found",
-		}, nil
-	}
-
 	err := a.db.Delete(&models.Contact{}, in.Phone).Error
 
 	if err != nil {
