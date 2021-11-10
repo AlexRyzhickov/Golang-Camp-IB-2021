@@ -1,7 +1,7 @@
 package main
 
 import (
-	"addressbook/cmd/config"
+	"addressbook/internal/config"
 	models "addressbook/internal/model"
 	"addressbook/internal/pb"
 	"addressbook/internal/service"
