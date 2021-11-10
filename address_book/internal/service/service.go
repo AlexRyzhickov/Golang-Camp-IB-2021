@@ -24,6 +24,19 @@ func (a *AddressBookService) AddContact(_ context.Context, in *pb.AddContactRequ
 		}, nil
 	}
 
+	var count int64 = 0
+	if err := a.db.Limit(1).Find(&models.Contact{}, in.Contact.Phone).Count(&count).Error; err != nil {
+		return &pb.AddContactResponse{
+			Msg: "adding error",
+		}, nil
+	}
+
+	if count == 1 {
+		return &pb.AddContactResponse{
+			Msg: "Сontact has already been added",
+		}, nil
+	}
+
 	err := a.db.Create(&models.Contact{
 		Phone:   in.Contact.Phone,
 		Name:    in.Contact.Name,
@@ -77,16 +90,7 @@ func (a *AddressBookService) DeleteContact(_ context.Context, in *pb.DeleteConta
 	}
 
 	var count int64 = 0
-	var user models.Contact
-	if err := a.db.Limit(1).Find(&user, in.Phone).Count(&count).Error; err != nil {
-		return &pb.DeleteContactResponse{
-			Msg: "delete error",
-		}, nil
-	}
-
-	err := a.db.Delete(&models.Contact{}, in.Phone).Error
-
-	if err != nil {
+	if err := a.db.Limit(1).Find(&models.Contact{}, in.Phone).Count(&count).Error; err != nil {
 		return &pb.DeleteContactResponse{
 			Msg: "delete error",
 		}, nil
@@ -95,6 +99,14 @@ func (a *AddressBookService) DeleteContact(_ context.Context, in *pb.DeleteConta
 	if count == 0 {
 		return &pb.DeleteContactResponse{
 			Msg: "Contact not found",
+		}, nil
+	}
+
+	err := a.db.Delete(&models.Contact{}, in.Phone).Error
+
+	if err != nil {
+		return &pb.DeleteContactResponse{
+			Msg: "delete error",
 		}, nil
 	}
 
