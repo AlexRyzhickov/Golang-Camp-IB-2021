@@ -10,6 +10,8 @@ services:
       DBConn: postgres://postgres:postgres@db/backend?sslmode=disable
 
   db:
+    ports:
+      - 5432:5432
     image: postgres:12
     environment:
       POSTGRES_DB: backend
