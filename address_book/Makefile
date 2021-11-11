@@ -25,3 +25,7 @@ run-db:
 		-e POSTGRES_USER=postgres \
 		-e POSTGRES_PASSWORD=postgres \
 		postgres:12
+
+.PHONY: run-kube
+run-kube:
+	@kubectl apply -f manifest.yaml
