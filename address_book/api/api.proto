@@ -5,10 +5,30 @@ option go_package = "address_book/internal/pb";
 import "google/api/annotations.proto";
 
 service AddressBookService {
-  rpc AddContact(AddContactRequest) returns (AddContactResponse) {}
-  rpc FindContact(FindContactRequest) returns (FindContactResponse) {}
-  rpc DeleteContact(DeleteContactRequest) returns (DeleteContactResponse) {}
-  rpc UpdateContact(UpdateContactRequest) returns (UpdateContactResponse){}
+  rpc AddContact(AddContactRequest) returns (AddContactResponse) {
+    option (google.api.http) = {
+      post: "/addContact"
+      body: "*"
+    };
+  }
+  rpc FindContact(FindContactRequest) returns (FindContactResponse) {
+    option (google.api.http) = {
+      post: "/findContact"
+      body: "*"
+    };
+  }
+  rpc DeleteContact(DeleteContactRequest) returns (DeleteContactResponse) {
+    option (google.api.http) = {
+      post: "/deleteContact"
+      body: "*"
+    };
+  }
+  rpc UpdateContact(UpdateContactRequest) returns (UpdateContactResponse){
+    option (google.api.http) = {
+      post: "/updateContact"
+      body: "*"
+    };
+  }
 }
 
 message Contact {
