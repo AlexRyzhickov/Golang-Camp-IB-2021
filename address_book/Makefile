@@ -29,3 +29,7 @@ run-db:
 .PHONY: run-kube
 run-kube:
 	@kubectl apply -f manifest.yaml
+
+.PHONY: docker-compose-up
+docker-compose-up:
+	@docker-compose up
