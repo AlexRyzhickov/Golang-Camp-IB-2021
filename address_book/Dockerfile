@@ -1,23 +1,12 @@
-FROM golang:1.17
+FROM golang
 
-WORKDIR /workdir
+WORKDIR /src
 ADD . .
-RUN go mod download
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o bin/app cmd/server/main.go
+RUN CGO_ENABLED=0 go build -o /bin/app cmd/server/main.go
 
-EXPOSE 8080
+FROM alpine
 
-ENTRYPOINT ["/workdir/bin/app"]
+WORKDIR /bin
+COPY --from=0 /bin/app .
 
-#FROM golang
-#
-#WORKDIR /src
-#ADD . .
-#RUN CGO_ENABLED=0 go build -o /bin/app cmd/main.go
-#
-#FROM alpine
-#
-#WORKDIR /bin
-#COPY --from=0 /bin/app .
-#
-#ENTRYPOINT ["app"]
+ENTRYPOINT ["app"]
