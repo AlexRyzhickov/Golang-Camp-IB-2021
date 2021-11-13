@@ -36,12 +36,7 @@ Content-Type: application/json
 }
 
 ###
-POST http://127.0.0.1:8081/delete
-Content-Type: application/json
-
-{
- "phone": "89871726755"
-}
+DELETE http://127.0.0.1:8081/delete/89871726755
 
 ###
 POST http://127.0.0.1:8081/update

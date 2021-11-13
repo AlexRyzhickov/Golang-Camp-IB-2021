@@ -19,8 +19,7 @@ service AddressBookService {
   }
   rpc DeleteContact(DeleteContactRequest) returns (DeleteContactResponse) {
     option (google.api.http) = {
-      post: "/delete"
-      body: "*"
+      delete: "/delete/{phone}"
     };
   }
   rpc UpdateContact(UpdateContactRequest) returns (UpdateContactResponse){
