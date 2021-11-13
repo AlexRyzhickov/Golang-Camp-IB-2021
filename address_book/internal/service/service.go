@@ -108,7 +108,7 @@ func (a *AddressBookService) UpdateContact(_ context.Context, in *pb.UpdateConta
 		Address: in.Contact.Address,
 	}
 
-	err := a.db.Model(&contact).Updates(models.Contact{Phone: contact.Phone, Name: contact.Name, Address: contact.Address}).Error
+	err := a.db.Model(&contact).Updates(models.Contact{Name: contact.Name, Address: contact.Address}).Error
 
 	if err != nil {
 		return &pb.UpdateContactResponse{Msg: updateError}, nil
