@@ -50,7 +50,7 @@ func (a *AddressBookService) AddContact(_ context.Context, in *pb.AddContactRequ
 	}).Error
 
 	if err != nil {
-		return &pb.AddContactResponse{Msg: addError}, err
+		return &pb.AddContactResponse{Msg: fmt.Sprintf("%s %v", addError, err)}, err
 	}
 
 	return &pb.AddContactResponse{Msg: successAdding}, nil
@@ -89,7 +89,7 @@ func (a *AddressBookService) DeleteContact(_ context.Context, in *pb.DeleteConta
 	err := a.db.Delete(&models.Contact{}, in.Phone).Error
 
 	if err != nil {
-		return &pb.DeleteContactResponse{Msg: deleteError}, nil
+		return &pb.DeleteContactResponse{Msg: fmt.Sprintf("%s %v", deleteError, err)}, nil
 	}
 
 	return &pb.DeleteContactResponse{Msg: successDeleting}, nil
@@ -111,7 +111,7 @@ func (a *AddressBookService) UpdateContact(_ context.Context, in *pb.UpdateConta
 	err := a.db.Model(&contact).Updates(models.Contact{Name: contact.Name, Address: contact.Address}).Error
 
 	if err != nil {
-		return &pb.UpdateContactResponse{Msg: updateError}, nil
+		return &pb.UpdateContactResponse{Msg: fmt.Sprintf("%s %v", updateError, err)}, nil
 	}
 
 	return &pb.UpdateContactResponse{Msg: successUpdating}, nil
@@ -129,7 +129,7 @@ func getFindContactMsg(size int) string {
 
 func processFindContact(findContacts *[]models.Contact, err error) (*pb.FindContactResponse, error) {
 	if err != nil {
-		return &pb.FindContactResponse{Msg: findError}, err
+		return &pb.FindContactResponse{Msg: fmt.Sprintf("%s %v", findError, err)}, err
 	}
 
 	contacts := []*pb.Contact{}
