@@ -14,28 +14,33 @@ type AddressBookService struct {
 	db *gorm.DB
 }
 
+const invalidInputData = "Invalid input data error"
+const successAdding = "Contact added successfully"
+const successDeleting = "Contact deleted successfully"
+const successUpdating = "Contact updated successfully"
+const addError = "Adding contact error"
+const updateError = "Updating contact error"
+const deleteError = "Deleting contact error"
+const findError = "Search contact error"
+const wrongValueSearchError = "Search value wrong error"
+const addingDuplicateContactErr = "Contact has already been added"
+
 func NewAddressBookService(db *gorm.DB) *AddressBookService {
 	return &AddressBookService{db: db}
 }
 
 func (a *AddressBookService) AddContact(_ context.Context, in *pb.AddContactRequest) (*pb.AddContactResponse, error) {
 	if in == nil || in.Contact == nil {
-		return &pb.AddContactResponse{
-			Msg: "Contact has not been added",
-		}, nil
+		return &pb.AddContactResponse{Msg: invalidInputData}, nil
 	}
 
 	var count int64 = 0
 	if err := a.db.Limit(1).Find(&models.Contact{}, in.Contact.Phone).Count(&count).Error; err != nil {
-		return &pb.AddContactResponse{
-			Msg: "adding error",
-		}, nil
+		return &pb.AddContactResponse{Msg: addError}, nil
 	}
 
 	if count == 1 {
-		return &pb.AddContactResponse{
-			Msg: "Сontact has already been added",
-		}, nil
+		return &pb.AddContactResponse{Msg: addingDuplicateContactErr}, nil
 	}
 
 	err := a.db.Create(&models.Contact{
@@ -45,21 +50,15 @@ func (a *AddressBookService) AddContact(_ context.Context, in *pb.AddContactRequ
 	}).Error
 
 	if err != nil {
-		return &pb.AddContactResponse{
-			Msg: "Сontact has already been added",
-		}, err
+		return &pb.AddContactResponse{Msg: addError}, err
 	}
 
-	return &pb.AddContactResponse{
-		Msg: "Contact added successfully",
-	}, nil
+	return &pb.AddContactResponse{Msg: successAdding}, nil
 }
 
 func (a *AddressBookService) FindContact(_ context.Context, in *pb.FindContactRequest) (*pb.FindContactResponse, error) {
 	if in == nil || in.Query == "" {
-		return &pb.FindContactResponse{
-			Msg: "Empty query, contact has not been found",
-		}, nil
+		return &pb.FindContactResponse{Msg: invalidInputData}, nil
 	}
 
 	switch in.SearchType {
@@ -77,35 +76,29 @@ func (a *AddressBookService) FindContact(_ context.Context, in *pb.FindContactRe
 		return processFindContact(&findContacts, err)
 	default:
 		return &pb.FindContactResponse{
-			Msg: "Search value wrong",
+			Msg: wrongValueSearchError,
 		}, nil
 	}
 }
 
 func (a *AddressBookService) DeleteContact(_ context.Context, in *pb.DeleteContactRequest) (*pb.DeleteContactResponse, error) {
 	if in == nil {
-		return &pb.DeleteContactResponse{
-			Msg: "Contact has not been deleted",
-		}, nil
+		return &pb.DeleteContactResponse{Msg: invalidInputData}, nil
 	}
 
 	err := a.db.Delete(&models.Contact{}, in.Phone).Error
 
 	if err != nil {
-		return &pb.DeleteContactResponse{
-			Msg: "delete error",
-		}, nil
+		return &pb.DeleteContactResponse{Msg: deleteError}, nil
 	}
 
-	return &pb.DeleteContactResponse{
-		Msg: "Contact deleted successfully",
-	}, nil
+	return &pb.DeleteContactResponse{Msg: successDeleting}, nil
 }
 
 func (a *AddressBookService) UpdateContact(_ context.Context, in *pb.UpdateContactRequest) (*pb.UpdateContactResponse, error) {
 	if in == nil || in.Contact == nil {
 		return &pb.UpdateContactResponse{
-			Msg: "Contact has not been updated",
+			Msg: invalidInputData,
 		}, nil
 	}
 
@@ -118,19 +111,15 @@ func (a *AddressBookService) UpdateContact(_ context.Context, in *pb.UpdateConta
 	err := a.db.Model(&contact).Updates(models.Contact{Phone: contact.Phone, Name: contact.Name, Address: contact.Address}).Error
 
 	if err != nil {
-		return &pb.UpdateContactResponse{
-			Msg: "update error",
-		}, nil
+		return &pb.UpdateContactResponse{Msg: updateError}, nil
 	}
 
-	return &pb.UpdateContactResponse{
-		Msg: "Contact updated successfully",
-	}, nil
+	return &pb.UpdateContactResponse{Msg: successUpdating}, nil
 }
 
 func getFindContactMsg(size int) string {
 	if size == 1 {
-		return "One contact was found"
+		return "One contact was found successfully"
 	}
 	if size > 0 {
 		return fmt.Sprintf("Contacts were found successfully, number of contacts: %v", size)
@@ -140,9 +129,7 @@ func getFindContactMsg(size int) string {
 
 func processFindContact(findContacts *[]models.Contact, err error) (*pb.FindContactResponse, error) {
 	if err != nil {
-		return &pb.FindContactResponse{
-			Msg: "search error",
-		}, err
+		return &pb.FindContactResponse{Msg: findError}, err
 	}
 
 	contacts := []*pb.Contact{}
@@ -155,8 +142,5 @@ func processFindContact(findContacts *[]models.Contact, err error) (*pb.FindCont
 		})
 	}
 
-	return &pb.FindContactResponse{
-		Contacts: contacts,
-		Msg:      getFindContactMsg(len(contacts)),
-	}, nil
+	return &pb.FindContactResponse{Contacts: contacts, Msg: getFindContactMsg(len(contacts))}, nil
 }
