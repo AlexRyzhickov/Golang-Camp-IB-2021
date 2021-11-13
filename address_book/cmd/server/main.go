@@ -58,8 +58,12 @@ func main() {
 
 	go func() {
 		mux := runtime.NewServeMux()
-		pb.RegisterAddressBookServiceHandlerServer(context.Background(), mux, srv)
-		log.Fatalln(http.ListenAndServe(":8081", mux))
+		if err := pb.RegisterAddressBookServiceHandlerServer(context.Background(), mux, srv); err != nil {
+			log.Fatal(err)
+		}
+		if err = http.ListenAndServe(":"+cfg.ProxyPort, mux); err != nil {
+			log.Fatal(err)
+		}
 	}()
 
 	pb.RegisterAddressBookServiceServer(s, service.NewAddressBookService(db))

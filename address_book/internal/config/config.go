@@ -5,8 +5,9 @@ import (
 )
 
 type Config struct {
-	Port   string `env:"PORT" envDefault:"8080"`
-	DBConn string `env:"DBConn" envDefault:"host=localhost user=postgres password=postgres dbname=backend port=5432 sslmode=disable"`
+	Port      string `env:"PORT" envDefault:"8080"`
+	ProxyPort string `env:"HTTP_PORT" envDefault:"8081"`
+	DBConn    string `env:"DBConn" envDefault:"host=localhost user=postgres password=postgres dbname=backend port=5432 sslmode=disable"`
 }
 
 func New() (*Config, error) {
