@@ -5,8 +5,11 @@ import (
 	models "addressbook/internal/model"
 	"addressbook/internal/pb"
 	"addressbook/internal/service"
+	"context"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"log"
 	"net"
+	"net/http"
 
 	"google.golang.org/grpc"
 	"gorm.io/driver/postgres"
@@ -50,6 +53,14 @@ func main() {
 	if err = initializeDB(db); err != nil {
 		log.Fatal("failed to init `contact` table", err)
 	}
+
+	srv := service.NewAddressBookService(db)
+
+	go func() {
+		mux := runtime.NewServeMux()
+		pb.RegisterAddressBookServiceHandlerServer(context.Background(), mux, srv)
+		log.Fatalln(http.ListenAndServe(":8081", mux))
+	}()
 
 	pb.RegisterAddressBookServiceServer(s, service.NewAddressBookService(db))
 	log.Printf("Server is listening on: %v", lis.Addr())

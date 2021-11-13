@@ -179,7 +179,7 @@ func RegisterAddressBookServiceHandlerServer(ctx context.Context, mux *runtime.S
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pb.AddressBookService/AddContact", runtime.WithHTTPPathPattern("/addContact"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pb.AddressBookService/AddContact", runtime.WithHTTPPathPattern("/add"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -202,7 +202,7 @@ func RegisterAddressBookServiceHandlerServer(ctx context.Context, mux *runtime.S
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pb.AddressBookService/FindContact", runtime.WithHTTPPathPattern("/findContact"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pb.AddressBookService/FindContact", runtime.WithHTTPPathPattern("/find"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -225,7 +225,7 @@ func RegisterAddressBookServiceHandlerServer(ctx context.Context, mux *runtime.S
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pb.AddressBookService/DeleteContact", runtime.WithHTTPPathPattern("/deleteContact"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pb.AddressBookService/DeleteContact", runtime.WithHTTPPathPattern("/delete"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -248,7 +248,7 @@ func RegisterAddressBookServiceHandlerServer(ctx context.Context, mux *runtime.S
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pb.AddressBookService/UpdateContact", runtime.WithHTTPPathPattern("/updateContact"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pb.AddressBookService/UpdateContact", runtime.WithHTTPPathPattern("/update"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -310,7 +310,7 @@ func RegisterAddressBookServiceHandlerClient(ctx context.Context, mux *runtime.S
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/pb.AddressBookService/AddContact", runtime.WithHTTPPathPattern("/addContact"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/pb.AddressBookService/AddContact", runtime.WithHTTPPathPattern("/add"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -330,7 +330,7 @@ func RegisterAddressBookServiceHandlerClient(ctx context.Context, mux *runtime.S
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/pb.AddressBookService/FindContact", runtime.WithHTTPPathPattern("/findContact"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/pb.AddressBookService/FindContact", runtime.WithHTTPPathPattern("/find"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -350,7 +350,7 @@ func RegisterAddressBookServiceHandlerClient(ctx context.Context, mux *runtime.S
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/pb.AddressBookService/DeleteContact", runtime.WithHTTPPathPattern("/deleteContact"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/pb.AddressBookService/DeleteContact", runtime.WithHTTPPathPattern("/delete"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -370,7 +370,7 @@ func RegisterAddressBookServiceHandlerClient(ctx context.Context, mux *runtime.S
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/pb.AddressBookService/UpdateContact", runtime.WithHTTPPathPattern("/updateContact"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/pb.AddressBookService/UpdateContact", runtime.WithHTTPPathPattern("/update"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -390,13 +390,13 @@ func RegisterAddressBookServiceHandlerClient(ctx context.Context, mux *runtime.S
 }
 
 var (
-	pattern_AddressBookService_AddContact_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"addContact"}, ""))
+	pattern_AddressBookService_AddContact_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"add"}, ""))
 
-	pattern_AddressBookService_FindContact_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"findContact"}, ""))
+	pattern_AddressBookService_FindContact_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"find"}, ""))
 
-	pattern_AddressBookService_DeleteContact_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"deleteContact"}, ""))
+	pattern_AddressBookService_DeleteContact_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"delete"}, ""))
 
-	pattern_AddressBookService_UpdateContact_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"updateContact"}, ""))
+	pattern_AddressBookService_UpdateContact_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"update"}, ""))
 )
 
 var (

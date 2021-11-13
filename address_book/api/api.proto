@@ -7,25 +7,25 @@ import "google/api/annotations.proto";
 service AddressBookService {
   rpc AddContact(AddContactRequest) returns (AddContactResponse) {
     option (google.api.http) = {
-      post: "/addContact"
+      post: "/add"
       body: "*"
     };
   }
   rpc FindContact(FindContactRequest) returns (FindContactResponse) {
     option (google.api.http) = {
-      post: "/findContact"
+      post: "/find"
       body: "*"
     };
   }
   rpc DeleteContact(DeleteContactRequest) returns (DeleteContactResponse) {
     option (google.api.http) = {
-      post: "/deleteContact"
+      post: "/delete"
       body: "*"
     };
   }
   rpc UpdateContact(UpdateContactRequest) returns (UpdateContactResponse){
     option (google.api.http) = {
-      post: "/updateContact"
+      post: "/update"
       body: "*"
     };
   }
