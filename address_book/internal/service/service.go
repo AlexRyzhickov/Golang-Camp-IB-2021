@@ -5,6 +5,7 @@ import (
 	"addressbook/internal/pb"
 	"context"
 	"fmt"
+	"log"
 
 	"gorm.io/gorm"
 )
@@ -34,23 +35,15 @@ func (a *AddressBookService) AddContact(_ context.Context, in *pb.AddContactRequ
 		return &pb.AddContactResponse{Msg: invalidInputData}, nil
 	}
 
-	var count int64 = 0
-	if err := a.db.Limit(1).Find(&models.Contact{}, in.Contact.Phone).Count(&count).Error; err != nil {
-		return &pb.AddContactResponse{Msg: addError}, nil
-	}
-
-	if count == 1 {
-		return &pb.AddContactResponse{Msg: addingDuplicateContactErr}, nil
-	}
-
-	err := a.db.Create(&models.Contact{
+	err := a.db.FirstOrCreate(&models.Contact{
 		Phone:   in.Contact.Phone,
 		Name:    in.Contact.Name,
 		Address: in.Contact.Address,
 	}).Error
 
 	if err != nil {
-		return &pb.AddContactResponse{Msg: fmt.Sprintf("%s %v", addError, err)}, err
+		log.Println(fmt.Sprintf("%s, %v", addError, err.Error()))
+		return &pb.AddContactResponse{Msg: fmt.Sprintf("%s, %v", addError, err.Error())}, err
 	}
 
 	return &pb.AddContactResponse{Msg: successAdding}, nil
