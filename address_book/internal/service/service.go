@@ -5,7 +5,6 @@ import (
 	"addressbook/internal/pb"
 	"context"
 	"fmt"
-	"log"
 
 	"gorm.io/gorm"
 )
@@ -24,7 +23,6 @@ const updateError = "Updating contact error"
 const deleteError = "Deleting contact error"
 const findError = "Search contact error"
 const wrongValueSearchError = "Search value wrong error"
-const addingDuplicateContactErr = "Contact has already been added"
 
 func NewAddressBookService(db *gorm.DB) *AddressBookService {
 	return &AddressBookService{db: db}
@@ -42,7 +40,6 @@ func (a *AddressBookService) AddContact(_ context.Context, in *pb.AddContactRequ
 	}).Error
 
 	if err != nil {
-		log.Println(fmt.Sprintf("%s, %v", addError, err.Error()))
 		return &pb.AddContactResponse{Msg: fmt.Sprintf("%s, %v", addError, err.Error())}, err
 	}
 
