@@ -19,6 +19,9 @@ const updateError = "Updating contact error"
 const deleteError = "Deleting contact error"
 const findError = "Search contact error"
 const wrongValueSearchError = "Search value wrong error"
+const findZeroContactMsg = "No contacts were found"
+const findOneContactMsg = "One contact was found successfully"
+const findSomeContactsMsg = "Contacts were found successfully, number of contacts:"
 
 type gormInterface interface {
 	FirstOrCreate(dest interface{}, conds ...interface{}) (tx *gorm.DB)
@@ -92,7 +95,7 @@ func (a *AddressBookService) DeleteContact(_ context.Context, in *pb.DeleteConta
 	err := a.db.Delete(&models.Contact{}, in.Phone).Error
 
 	if err != nil {
-		return &pb.DeleteContactResponse{Msg: fmt.Sprintf("%s %v", deleteError, err)}, nil
+		return &pb.DeleteContactResponse{Msg: fmt.Sprintf("%s, %v", deleteError, err)}, err
 	}
 
 	return &pb.DeleteContactResponse{Msg: successDeleting}, nil
@@ -114,7 +117,7 @@ func (a *AddressBookService) UpdateContact(_ context.Context, in *pb.UpdateConta
 	err := a.db.Model(&contact).Updates(models.Contact{Name: contact.Name, Address: contact.Address}).Error
 
 	if err != nil {
-		return &pb.UpdateContactResponse{Msg: fmt.Sprintf("%s %v", updateError, err)}, nil
+		return &pb.UpdateContactResponse{Msg: fmt.Sprintf("%s, %v", updateError, err)}, err
 	}
 
 	return &pb.UpdateContactResponse{Msg: successUpdating}, nil
@@ -122,17 +125,17 @@ func (a *AddressBookService) UpdateContact(_ context.Context, in *pb.UpdateConta
 
 func getFindContactMsg(size int) string {
 	if size == 1 {
-		return "One contact was found successfully"
+		return findOneContactMsg
 	}
 	if size > 0 {
-		return fmt.Sprintf("Contacts were found successfully, number of contacts: %v", size)
+		return fmt.Sprintf("%s %v", findSomeContactsMsg, size)
 	}
-	return "No contacts were found"
+	return findZeroContactMsg
 }
 
 func processFindContact(findContacts *[]models.Contact, err error) (*pb.FindContactResponse, error) {
 	if err != nil {
-		return &pb.FindContactResponse{Msg: fmt.Sprintf("%s %v", findError, err)}, err
+		return &pb.FindContactResponse{Msg: fmt.Sprintf("%s, %v", findError, err)}, err
 	}
 
 	contacts := []*pb.Contact{}
