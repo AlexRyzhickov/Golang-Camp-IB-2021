@@ -88,7 +88,7 @@ func main() {
 
 		// FindFindContactByPhone as wildcards
 		findResp, err = c.FindContact(ctx, &pb.FindContactRequest{
-			Query:      "8987_______",
+			Query:      "8987???????",
 			SearchType: pb.FindContactRequest_PHONE,
 		})
 
@@ -99,7 +99,7 @@ func main() {
 
 		// FindFindContactByPhone as wildcards
 		findResp, err = c.FindContact(ctx, &pb.FindContactRequest{
-			Query:      "8987%",
+			Query:      "8987*",
 			SearchType: pb.FindContactRequest_PHONE,
 		})
 

@@ -24,7 +24,7 @@ POST http://127.0.0.1:8081/find
 Content-Type: application/json
 
 {
-  "query": "8987_______",
+  "query": "8987???????",
   "searchType": 1
 }
 
@@ -33,7 +33,7 @@ POST http://127.0.0.1:8081/find
 Content-Type: application/json
 
 {
-  "query": "8987%",
+  "query": "8987*",
   "searchType": 1
 }
 

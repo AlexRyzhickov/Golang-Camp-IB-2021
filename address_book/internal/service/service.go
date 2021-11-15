@@ -5,6 +5,7 @@ import (
 	"addressbook/internal/pb"
 	"context"
 	"fmt"
+	"strings"
 
 	"gorm.io/gorm"
 )
@@ -59,9 +60,12 @@ func (a *AddressBookService) FindContact(_ context.Context, in *pb.FindContactRe
 
 		return processFindContact(&findContacts, err)
 	case pb.FindContactRequest_PHONE:
+		matchString := strings.ReplaceAll(in.Query, "?", "_")
+		matchString = strings.ReplaceAll(matchString, "*", "%")
+
 		findContacts := []models.Contact{}
 
-		err := a.db.Where("phone LIKE ?", in.Query).Find(&findContacts).Error
+		err := a.db.Where("phone LIKE ?", matchString).Find(&findContacts).Error
 
 		return processFindContact(&findContacts, err)
 	default:
