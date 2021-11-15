@@ -10,11 +10,6 @@ import (
 	"gorm.io/gorm"
 )
 
-type AddressBookService struct {
-	pb.AddressBookServiceServer
-	db *gorm.DB
-}
-
 const invalidInputData = "Invalid input data error"
 const successAdding = "Contact added successfully"
 const successDeleting = "Contact deleted successfully"
@@ -24,6 +19,20 @@ const updateError = "Updating contact error"
 const deleteError = "Deleting contact error"
 const findError = "Search contact error"
 const wrongValueSearchError = "Search value wrong error"
+
+type gormInterface interface {
+	FirstOrCreate(dest interface{}, conds ...interface{}) (tx *gorm.DB)
+	Where(query interface{}, args ...interface{}) (tx *gorm.DB)
+	Find(dest interface{}, conds ...interface{}) (tx *gorm.DB)
+	Delete(value interface{}, conds ...interface{}) (tx *gorm.DB)
+	Model(value interface{}) (tx *gorm.DB)
+	Updates(values interface{}) (tx *gorm.DB)
+}
+
+type AddressBookService struct {
+	pb.AddressBookServiceServer
+	db gormInterface
+}
 
 func NewAddressBookService(db *gorm.DB) *AddressBookService {
 	return &AddressBookService{db: db}

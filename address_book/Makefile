@@ -33,3 +33,8 @@ run-kube:
 .PHONY: docker-compose-up
 docker-compose-up:
 	@docker-compose up
+
+.PHONY: gen-mocks
+gen-mocks:
+	docker run -v `pwd`:/src -w /src vektra/mockery:v2.9 --case snake --dir internal --output internal/mock --outpkg mock --all --exported
+
