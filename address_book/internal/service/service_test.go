@@ -21,12 +21,12 @@ func TestService(t *testing.T) {
 
 type Suite struct {
 	suite.Suite
-	db mock.GormInterface
+	db mock.DBInterface
 	a  AddressBookService
 }
 
 func (s *Suite) SetupTest() {
-	s.db = mock.GormInterface{}
+	s.db = mock.DBInterface{}
 	s.a = AddressBookService{
 		db: &s.db,
 	}
