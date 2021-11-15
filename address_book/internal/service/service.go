@@ -23,7 +23,7 @@ const findZeroContactMsg = "No contacts were found"
 const findOneContactMsg = "One contact was found successfully"
 const findSomeContactsMsg = "Contacts were found successfully, number of contacts:"
 
-type gormInterface interface {
+type DBInterface interface {
 	FirstOrCreate(dest interface{}, conds ...interface{}) (tx *gorm.DB)
 	Where(query interface{}, args ...interface{}) (tx *gorm.DB)
 	Find(dest interface{}, conds ...interface{}) (tx *gorm.DB)
@@ -34,7 +34,7 @@ type gormInterface interface {
 
 type AddressBookService struct {
 	pb.AddressBookServiceServer
-	db gormInterface
+	db DBInterface
 }
 
 func NewAddressBookService(db *gorm.DB) *AddressBookService {
