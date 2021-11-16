@@ -1,0 +1,53 @@
+###
+POST http://localhost:8081/add
+Content-Type: application/json
+
+{
+  "contact": {
+    "name": "Alex",
+    "phone": "89111726755",
+    "address": "Nevsky Prospekt, 11"
+  }
+}
+
+###
+POST http://localhost:8081/find
+Content-Type: application/json
+
+{
+  "query": "AlexRyzhickov",
+  "searchType": 0
+}
+
+###
+POST http://127.0.0.1:8081/find
+Content-Type: application/json
+
+{
+  "query": "8987???????",
+  "searchType": 1
+}
+
+###
+POST http://127.0.0.1:8081/find
+Content-Type: application/json
+
+{
+  "query": "8987*",
+  "searchType": 1
+}
+
+###
+DELETE http://127.0.0.1:8081/delete/89871726755
+
+###
+POST http://127.0.0.1:8081/update
+Content-Type: application/json
+
+{
+  "contact": {
+    "name": "AlexRyzhickov",
+    "phone": "89111726755",
+    "address": "Nevsky Prospekt, 11"
+  }
+}
