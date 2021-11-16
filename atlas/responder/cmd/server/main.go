@@ -7,7 +7,6 @@ import (
 	"net"
 	"strings"
 
-	"github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
