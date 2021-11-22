@@ -7,21 +7,21 @@
   ],
   "swagger": "2.0",
   "info": {
-    "title": "atlas/portal/pkg/pb/service.proto",
+    "title": "atlas/responder/pkg/pb/service.proto",
     "version": "version not set"
   },
   "paths": {
     "/version": {
       "get": {
         "tags": [
-          "Portal"
+          "Responder"
         ],
-        "operationId": "PortalPortal_GetVersion",
+        "operationId": "ResponderResponder_GetVersion",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/portalVersionResponse"
+              "$ref": "#/definitions/responderVersionResponse"
             }
           },
           "default": {
@@ -35,7 +35,7 @@
     }
   },
   "definitions": {
-    "portalVersionResponse": {
+    "responderVersionResponse": {
       "description": "TODO: Structure your own protobuf messages. Each protocol buffer message is a \nsmall logical record of information, containing a series of name-value pairs.",
       "type": "object",
       "properties": {
@@ -48,7 +48,7 @@
   },
   "tags": [
     {
-      "name": "Portal"
+      "name": "Responder"
     }
   ]
 }

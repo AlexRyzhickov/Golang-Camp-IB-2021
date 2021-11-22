@@ -1,8 +1,8 @@
 package main
 
 import (
-	"atlas-cli/responder/pkg/pb"
-	"atlas-cli/responder/pkg/svc"
+	"atlas/responder/pkg/pb"
+	"atlas/responder/pkg/svc"
 	"time"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"

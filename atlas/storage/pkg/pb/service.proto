@@ -9,7 +9,7 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 import "github.com/infobloxopen/protoc-gen-gorm/proto/options/gorm.proto";
 
 
-option go_package = "atlas-cli/storage/pkg/pb;pb";
+option go_package = "atlas/storage/pkg/pb;pb";
 
 // The Storage service, GetVersion RPC, and Version message
 // make up a simple "starter" example. It allows the Atlas CLI to generate an
@@ -32,28 +32,16 @@ option go_package = "atlas-cli/storage/pkg/pb;pb";
 message VersionResponse {
   string version = 1;
 }
-// Example Publish Response
-message PublishResponse {
-  string status = 1;
-}
 
-// Example Publish Request
-message PublishRequest {
-  string message = 1;
-}
 // TODO: Define the Storage service and its methods. Feel free
 // to change the name of Storage to better-suit your naming
 // conventions.
 service Storage {
   rpc GetVersion (google.protobuf.Empty) returns (VersionResponse) {
-    
-  }
-
-  // Example Publish call
-  rpc Publish (PublishRequest) returns (PublishResponse) {
+    // TODO: Provide mappings between REST endpoints and service methods.
     option (google.api.http) = {
-      post: "/publish"
-      body: "*"
+      get: "/version"
     };
   }
+
 }

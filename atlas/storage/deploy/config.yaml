@@ -4,7 +4,7 @@ server:
   address: 0.0.0.0
   port: 9090
 gateway:
-  enable: false
+  enable: true
   address: 0.0.0.0
   port: 8080
   endpoint: /storage/v1/
@@ -21,7 +21,7 @@ database:
   ssl: disable
   option:
 atlas.pubsub:
-  enable: true
+  enable: false
   address: atlas.pubsub
   port: 5555 
   publish: topic

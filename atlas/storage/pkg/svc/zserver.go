@@ -1,17 +1,11 @@
 package svc
 
 import (
-	"atlas-cli/storage/pkg/pb"
+	"atlas/storage/pkg/pb"
 	"context"
-	"fmt"
-	"log"
-	"time"
 
 	"github.com/golang/protobuf/ptypes/empty"
-	pubsubgrpc "github.com/infobloxopen/atlas-pubsub/grpc"
 	"github.com/jinzhu/gorm"
-	"github.com/spf13/viper"
-	"google.golang.org/grpc"
 )
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -35,9 +29,6 @@ import (
 // simple "starter" example that allows an end-to-end example. It is not
 // required.
 //
-// TODO: Update the Publish function to better-suit your application, or get
-// rid of it if your application is not using atlas pubsub.
-//
 // TODO: Oh yeah, delete this guide when you no longer need it.
 //
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~ FAREWELL AND GOOD LUCK ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -54,25 +45,6 @@ type server struct{ db *gorm.DB }
 // GetVersion returns the current version of the service
 func (server) GetVersion(context.Context, *empty.Empty) (*pb.VersionResponse, error) {
 	return &pb.VersionResponse{Version: version}, nil
-}
-
-// Publish publishes a message to the pubsub server with the publish request message
-// TODO update example publish with your own logic.
-func (server) Publish(ctx context.Context, pr *pb.PublishRequest) (*pb.PublishResponse, error) {
-	var url = fmt.Sprintf("%s:%s", viper.GetString("atlas.pubsub.address"), viper.GetString("atlas.pubsub.port"))
-	var topic = viper.GetString("atlas.pubsub.publish")
-	log.Printf("publishing hello world message to %s with topic %q", url, topic)
-	conn, err := grpc.Dial(url, grpc.WithInsecure())
-	if err != nil {
-		log.Fatalf("pubsub publisher: Failed to dial to grpc server: %v", err)
-	}
-	p := pubsubgrpc.NewPublisher(topic, conn)
-	msg := fmt.Sprintf("%s, %s %s", "Hello World", pr.GetMessage(), time.Now())
-	if err := p.Publish(context.Background(), []byte(msg), nil); err != nil {
-		return &pb.PublishResponse{Status: "Failed publishing message"}, nil
-	}
-
-	return &pb.PublishResponse{Status: "Message published"}, nil
 }
 
 // NewBasicServer returns an instance of the default server interface

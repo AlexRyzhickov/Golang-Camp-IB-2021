@@ -1,23 +1,28 @@
 package main
 
 import (
+	"atlas/responder/pkg/pb"
 	"context"
 	"fmt"
 	"log"
 	"net"
+	"net/http"
 	"strings"
 
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
-	"google.golang.org/grpc"
+
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/reflect/protoreflect"
+
+	"github.com/infobloxopen/atlas-app-toolkit/gateway"
+	"github.com/infobloxopen/atlas-app-toolkit/server"
 
 	"github.com/infobloxopen/atlas-app-toolkit/gorm/resource"
-	"github.com/infobloxopen/atlas-app-toolkit/server"
-	pubsubgrpc "github.com/infobloxopen/atlas-pubsub/grpc"
 )
 
 func main() {
@@ -28,10 +33,6 @@ func main() {
 	}
 
 	go func() { doneC <- ServeExternal(logger) }()
-
-	if viper.GetBool("atlas.pubsub.enable") {
-		InitSubscriber(logger)
-	}
 
 	if err := <-doneC; err != nil {
 		logger.Fatal(err)
@@ -84,6 +85,21 @@ func ServeExternal(logger *logrus.Logger) error {
 
 	s, err := server.NewServer(
 		server.WithGrpcServer(grpcServer),
+		server.WithGateway(
+			gateway.WithGatewayOptions(
+				runtime.WithMarshalerOption(runtime.MIMEWildcard, &runtime.JSONPb{
+					MarshalOptions: protojson.MarshalOptions{
+						UseProtoNames:   true,
+						EmitUnpopulated: false,
+					},
+				}),
+				runtime.WithForwardResponseOption(forwardResponseOption),
+				runtime.WithIncomingHeaderMatcher(gateway.AtlasDefaultHeaderMatcher()),
+			),
+			gateway.WithServerAddress(fmt.Sprintf("%s:%s", viper.GetString("server.address"), viper.GetString("server.port"))),
+			gateway.WithEndpointRegistration(viper.GetString("gateway.endpoint"), pb.RegisterResponderHandlerFromEndpoint),
+		),
+		server.WithHandler("/swagger/", NewSwaggerHandler(viper.GetString("gateway.swaggerFile"))),
 	)
 	if err != nil {
 		logger.Fatalln(err)
@@ -94,9 +110,15 @@ func ServeExternal(logger *logrus.Logger) error {
 		logger.Fatalln(err)
 	}
 
-	logger.Printf("serving gRPC at %s:%s", viper.GetString("server.address"), viper.GetString("server.port"))
+	httpL, err := net.Listen("tcp", fmt.Sprintf("%s:%s", viper.GetString("gateway.address"), viper.GetString("gateway.port")))
+	if err != nil {
+		logger.Fatalln(err)
+	}
 
-	return s.Serve(grpcL, nil)
+	logger.Printf("serving gRPC at %s:%s", viper.GetString("server.address"), viper.GetString("server.port"))
+	logger.Printf("serving http at %s:%s", viper.GetString("gateway.address"), viper.GetString("gateway.port"))
+
+	return s.Serve(grpcL, httpL)
 }
 
 func init() {
@@ -118,34 +140,7 @@ func init() {
 	resource.SetPlural()
 }
 
-// InitSubscriber initiliazes the example atlas-pubsub subscriber
-func InitSubscriber(logger *logrus.Logger) {
-	var url = fmt.Sprintf("%s:%s", viper.GetString("atlas.pubsub.address"), viper.GetString("atlas.pubsub.port"))
-	var topic = viper.GetString("atlas.pubsub.subscribe")
-	var subscriptionID = viper.GetString("atlas.pubsub.subscriber.id")
-	logger.Printf("pubsub: subscribing to server at %s with topic %q and subscription ID %q", url, topic, subscriptionID)
-	conn, err := grpc.Dial(url, grpc.WithInsecure())
-	if err != nil {
-		logger.Fatalf("pubsub subscriber: Failed to dial to grpc server won't receive any messages %v", err)
-	}
-	s := pubsubgrpc.NewSubscriber(topic, subscriptionID, conn)
-	c, e := s.Start(context.Background())
-	for {
-		select {
-		case msg, isOpen := <-c:
-			if !isOpen {
-				logger.Println("pubsub: subscription channel closed")
-				return
-			}
-			greeting := string(msg.Message())
-			logger.Printf("pubsub: received message: %q", greeting)
-			go func() {
-				if err := msg.Ack(); err != nil {
-					logger.Fatalf("pubsub: failed to ack messageID %q: %v", msg.MessageID(), err)
-				}
-			}()
-		case err := <-e:
-			logger.Printf("pubsub: encountered error reading subscription: %v", err)
-		}
-	}
+func forwardResponseOption(ctx context.Context, w http.ResponseWriter, resp protoreflect.ProtoMessage) error {
+	w.Header().Set("Cache-Control", "no-cache, no-store, max-age=0, must-revalidate")
+	return nil
 }

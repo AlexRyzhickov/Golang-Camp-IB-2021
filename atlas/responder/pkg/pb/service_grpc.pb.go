@@ -21,8 +21,6 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ResponderClient interface {
 	GetVersion(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*VersionResponse, error)
-	// Example Publish call
-	Publish(ctx context.Context, in *PublishRequest, opts ...grpc.CallOption) (*PublishResponse, error)
 }
 
 type responderClient struct {
@@ -42,22 +40,11 @@ func (c *responderClient) GetVersion(ctx context.Context, in *emptypb.Empty, opt
 	return out, nil
 }
 
-func (c *responderClient) Publish(ctx context.Context, in *PublishRequest, opts ...grpc.CallOption) (*PublishResponse, error) {
-	out := new(PublishResponse)
-	err := c.cc.Invoke(ctx, "/responder.Responder/Publish", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // ResponderServer is the server API for Responder service.
 // All implementations should embed UnimplementedResponderServer
 // for forward compatibility
 type ResponderServer interface {
 	GetVersion(context.Context, *emptypb.Empty) (*VersionResponse, error)
-	// Example Publish call
-	Publish(context.Context, *PublishRequest) (*PublishResponse, error)
 }
 
 // UnimplementedResponderServer should be embedded to have forward compatible implementations.
@@ -66,9 +53,6 @@ type UnimplementedResponderServer struct {
 
 func (UnimplementedResponderServer) GetVersion(context.Context, *emptypb.Empty) (*VersionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetVersion not implemented")
-}
-func (UnimplementedResponderServer) Publish(context.Context, *PublishRequest) (*PublishResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Publish not implemented")
 }
 
 // UnsafeResponderServer may be embedded to opt out of forward compatibility for this service.
@@ -100,24 +84,6 @@ func _Responder_GetVersion_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Responder_Publish_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PublishRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ResponderServer).Publish(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/responder.Responder/Publish",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ResponderServer).Publish(ctx, req.(*PublishRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // Responder_ServiceDesc is the grpc.ServiceDesc for Responder service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -129,11 +95,7 @@ var Responder_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "GetVersion",
 			Handler:    _Responder_GetVersion_Handler,
 		},
-		{
-			MethodName: "Publish",
-			Handler:    _Responder_Publish_Handler,
-		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "atlas-cli/responder/pkg/pb/service.proto",
+	Metadata: "atlas/responder/pkg/pb/service.proto",
 }

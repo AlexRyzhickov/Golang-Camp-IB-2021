@@ -10,7 +10,7 @@ const (
 	defaultServerPort    = "9090"
 
 	// Gateway
-	defaultGatewayEnable      = false
+	defaultGatewayEnable      = true
 	defaultGatewayAddress     = "0.0.0.0"
 	defaultGatewayPort        = "8080"
 	defaultGatewayURL         = "/storage/v1/"
@@ -30,7 +30,7 @@ const (
 	defaultDatabaseOption   = ""
 
 	// PubSub
-	defaultPubsubEnable       = true
+	defaultPubsubEnable       = false
 	defaultPubsubAddress      = "pubsub.atlas"
 	defaultPubsubPort         = "5555"
 	defaultPubsubPublish      = "example_hello"

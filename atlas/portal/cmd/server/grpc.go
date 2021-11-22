@@ -1,13 +1,11 @@
 package main
 
 import (
-	"atlas-cli/portal/pkg/pb"
-	"atlas-cli/portal/pkg/svc"
-	"time"
-
-	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
-	grpc_logrus "github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus"
-	grpc_validator "github.com/grpc-ecosystem/go-grpc-middleware/validator"
+	"atlas/portal/pkg/pb"
+	"atlas/portal/pkg/svc"
+	"github.com/grpc-ecosystem/go-grpc-middleware"
+	"github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus"
+	"github.com/grpc-ecosystem/go-grpc-middleware/validator"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/infobloxopen/atlas-app-toolkit/gateway"
 	"github.com/infobloxopen/atlas-app-toolkit/requestid"
@@ -16,6 +14,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
 	"google.golang.org/grpc/reflection"
+	"time"
 )
 
 func NewGRPCServer(logger *logrus.Logger) (*grpc.Server, error) {

@@ -7,21 +7,21 @@
   ],
   "swagger": "2.0",
   "info": {
-    "title": "atlas/portal/pkg/pb/service.proto",
+    "title": "atlas/storage/pkg/pb/service.proto",
     "version": "version not set"
   },
   "paths": {
     "/version": {
       "get": {
         "tags": [
-          "Portal"
+          "Storage"
         ],
-        "operationId": "PortalPortal_GetVersion",
+        "operationId": "StorageStorage_GetVersion",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/portalVersionResponse"
+              "$ref": "#/definitions/storageVersionResponse"
             }
           },
           "default": {
@@ -35,7 +35,8 @@
     }
   },
   "definitions": {
-    "portalVersionResponse": {
+    "rpcStatus": {},
+    "storageVersionResponse": {
       "description": "TODO: Structure your own protobuf messages. Each protocol buffer message is a \nsmall logical record of information, containing a series of name-value pairs.",
       "type": "object",
       "properties": {
@@ -43,12 +44,11 @@
           "type": "string"
         }
       }
-    },
-    "rpcStatus": {}
+    }
   },
   "tags": [
     {
-      "name": "Portal"
+      "name": "Storage"
     }
   ]
 }

@@ -4,7 +4,6 @@ package pb
 
 import (
 	context "context"
-
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -97,5 +96,5 @@ var Portal_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "atlas-cli/portal/pkg/pb/service.proto",
+	Metadata: "atlas/portal/pkg/pb/service.proto",
 }

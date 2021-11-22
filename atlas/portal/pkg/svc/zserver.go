@@ -1,9 +1,8 @@
 package svc
 
 import (
-	"atlas-cli/portal/pkg/pb"
+	"atlas/portal/pkg/pb"
 	"context"
-
 	"github.com/golang/protobuf/ptypes/empty"
 )
 

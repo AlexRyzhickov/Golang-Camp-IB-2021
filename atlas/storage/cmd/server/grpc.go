@@ -1,8 +1,8 @@
 package main
 
 import (
-	"atlas-cli/storage/pkg/pb"
-	"atlas-cli/storage/pkg/svc"
+	"atlas/storage/pkg/pb"
+	"atlas/storage/pkg/svc"
 	"time"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"

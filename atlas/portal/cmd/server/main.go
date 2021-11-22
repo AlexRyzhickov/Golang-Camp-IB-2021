@@ -1,9 +1,10 @@
 package main
 
 import (
-	"atlas-cli/portal/pkg/pb"
+	"atlas/portal/pkg/pb"
 	"context"
 	"fmt"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"log"
 	"net"
 	"net/http"
@@ -16,11 +17,9 @@ import (
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 
-	"google.golang.org/protobuf/encoding/protojson"
-	"google.golang.org/protobuf/reflect/protoreflect"
-
 	"github.com/infobloxopen/atlas-app-toolkit/gateway"
 	"github.com/infobloxopen/atlas-app-toolkit/server"
+	"google.golang.org/protobuf/encoding/protojson"
 
 	"github.com/infobloxopen/atlas-app-toolkit/gorm/resource"
 )

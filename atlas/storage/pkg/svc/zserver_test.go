@@ -1,7 +1,7 @@
 package svc
 
 import (
-	"atlas-cli/storage/pkg/pb"
+	"atlas/storage/pkg/pb"
 	"context"
 	"testing"
 

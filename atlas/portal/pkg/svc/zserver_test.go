@@ -1,11 +1,9 @@
 package svc
 
 import (
-	"atlas-cli/portal/pkg/pb"
 	"context"
-	"testing"
-
 	"github.com/golang/protobuf/ptypes/empty"
+	"testing"
 )
 
 func TestGetVersion(t *testing.T) {

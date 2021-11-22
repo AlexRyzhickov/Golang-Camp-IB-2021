@@ -1,7 +1,7 @@
 package svc
 
 import (
-	"atlas-cli/responder/pkg/pb"
+	"atlas/responder/pkg/pb"
 	"context"
 	"testing"
 
