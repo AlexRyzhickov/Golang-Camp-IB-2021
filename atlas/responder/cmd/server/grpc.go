@@ -47,7 +47,7 @@ func NewGRPCServer(logger *logrus.Logger) (*grpc.Server, error) {
 	)
 
 	// register service implementation with the grpcServer
-	s, err := svc.NewBasicServer()
+	s, err := svc.NewResponder()
 	if err != nil {
 		return nil, err
 	}

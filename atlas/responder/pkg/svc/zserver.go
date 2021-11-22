@@ -3,7 +3,6 @@ package svc
 import (
 	"atlas/responder/pkg/pb"
 	"context"
-
 	"github.com/golang/protobuf/ptypes/empty"
 )
 
@@ -38,15 +37,13 @@ const (
 	version = "0.0.1"
 )
 
-// Default implementation of the Responder server interface
-type server struct{}
-
-// GetVersion returns the current version of the service
-func (server) GetVersion(context.Context, *empty.Empty) (*pb.VersionResponse, error) {
-	return &pb.VersionResponse{Version: version}, nil
+type Responder struct {
+	pb.ResponderServer
 }
 
-// NewBasicServer returns an instance of the default server interface
-func NewBasicServer() (pb.ResponderServer, error) {
-	return &server{}, nil
+func NewResponder() (*Responder, error) {
+	return &Responder{}, nil
+}
+func (a *Responder) GetVersion(context.Context, *empty.Empty) (*pb.VersionResponse, error) {
+	return &pb.VersionResponse{Version: version}, nil
 }
