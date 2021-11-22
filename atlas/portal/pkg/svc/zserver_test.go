@@ -1,6 +1,7 @@
 package svc
 
 import (
+	"atlas/portal/pkg/pb"
 	"context"
 	"github.com/golang/protobuf/ptypes/empty"
 	"testing"
