@@ -26,4 +26,15 @@ run-db:
 		-e POSTGRES_PASSWORD=postgres \
 		postgres:12
 
+.PHONY: run-storage
+run-storage:
+	@dapr run --app-id sub \
+       --app-protocol http \
+       --app-port 8080 \
+       --dapr-http-port 3500 \
+       --log-level debug \
+       --components-path ./config \
+       go run cmd/server/*.go
+
+
 

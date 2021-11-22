@@ -1,28 +1,29 @@
 package main
 
 import (
-	"atlas/storage/pkg/pb"
+	models "atlas/storage/internal/model"
 	"context"
 	"fmt"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 	"log"
 	"net"
 	"net/http"
 	"strings"
 
-	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
-	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 
-	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/reflect/protoreflect"
 
-	"github.com/infobloxopen/atlas-app-toolkit/gateway"
 	"github.com/infobloxopen/atlas-app-toolkit/server"
 
 	"github.com/infobloxopen/atlas-app-toolkit/gorm/resource"
+
+	"github.com/dapr/go-sdk/service/common"
+	daprd "github.com/dapr/go-sdk/service/http"
 )
 
 func main() {
@@ -74,54 +75,47 @@ func ServeInternal(logger *logrus.Logger) error {
 	return s.Serve(nil, l)
 }
 
+var sub = &common.Subscription{
+	PubsubName: "messages",
+	Topic:      "neworder",
+	Route:      "/orders",
+}
+
 // ServeExternal builds and runs the server that listens on ServerAddress and GatewayAddress
 func ServeExternal(logger *logrus.Logger) error {
 
 	if viper.GetString("database.dsn") == "" {
 		setDBConnection()
 	}
-	grpcServer, err := NewGRPCServer(logger, viper.GetString("database.dsn"))
-	if err != nil {
-		logger.Fatalln(err)
-	}
-	grpc_prometheus.Register(grpcServer)
 
-	s, err := server.NewServer(
-		server.WithGrpcServer(grpcServer),
-		server.WithGateway(
-			gateway.WithGatewayOptions(
-				runtime.WithMarshalerOption(runtime.MIMEWildcard, &runtime.JSONPb{
-					MarshalOptions: protojson.MarshalOptions{
-						UseProtoNames:   true,
-						EmitUnpopulated: false,
-					},
-				}),
-				runtime.WithForwardResponseOption(forwardResponseOption),
-				runtime.WithIncomingHeaderMatcher(gateway.AtlasDefaultHeaderMatcher()),
-			),
-			gateway.WithServerAddress(fmt.Sprintf("%s:%s", viper.GetString("server.address"), viper.GetString("server.port"))),
-			gateway.WithEndpointRegistration(viper.GetString("gateway.endpoint"), pb.RegisterStorageHandlerFromEndpoint),
-		),
-		server.WithHandler("/swagger/", NewSwaggerHandler(viper.GetString("gateway.swaggerFile"))),
-	)
+	db, err := gorm.Open(postgres.Open(viper.GetString("database.dsn")), &gorm.Config{})
 	if err != nil {
 		logger.Fatalln(err)
 	}
 
-	grpcL, err := net.Listen("tcp", fmt.Sprintf("%s:%s", viper.GetString("server.address"), viper.GetString("server.port")))
-	if err != nil {
-		logger.Fatalln(err)
+	if isInit := db.Migrator().HasTable(&models.Note{}); !isInit {
+		err := db.Migrator().CreateTable(&models.Note{})
+		if err != nil {
+			logger.Fatalln(err)
+		}
 	}
 
-	httpL, err := net.Listen("tcp", fmt.Sprintf("%s:%s", viper.GetString("gateway.address"), viper.GetString("gateway.port")))
-	if err != nil {
-		logger.Fatalln(err)
+	s := daprd.NewService(":8080")
+
+	if err := s.AddTopicEventHandler(sub, eventHandler); err != nil {
+		logger.Fatalf("error adding topic subscription: %v", err)
 	}
 
-	logger.Printf("serving gRPC at %s:%s", viper.GetString("server.address"), viper.GetString("server.port"))
-	logger.Printf("serving http at %s:%s", viper.GetString("gateway.address"), viper.GetString("gateway.port"))
+	if err := s.Start(); err != nil && err != http.ErrServerClosed {
+		logger.Fatalf("error listenning: %v", err)
+	}
 
-	return s.Serve(grpcL, httpL)
+	return nil
+}
+
+func eventHandler(ctx context.Context, e *common.TopicEvent) (retry bool, err error) {
+	log.Printf("event - PubsubName: %s, Topic: %s, ID: %s, Data: %s", e.PubsubName, e.Topic, e.ID, e.Data)
+	return false, nil
 }
 
 func init() {

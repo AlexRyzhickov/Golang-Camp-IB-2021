@@ -1,11 +1,11 @@
 package svc
 
 import (
-	"atlas/storage/pkg/pb"
-	"context"
-
-	"github.com/golang/protobuf/ptypes/empty"
-	"gorm.io/gorm"
+//"atlas/storage/pkg/pb"
+//"context"
+//
+//"github.com/golang/protobuf/ptypes/empty"
+//"gorm.io/gorm"
 )
 
 const (
@@ -13,14 +13,14 @@ const (
 	version = "0.0.1"
 )
 
-type Storage struct {
-	pb.StorageServer
-	db *gorm.DB
-}
-
-func NewStorage(database *gorm.DB) (*Storage, error) {
-	return &Storage{db: database}, nil
-}
-func (a *Storage) GetVersion(context.Context, *empty.Empty) (*pb.VersionResponse, error) {
-	return &pb.VersionResponse{Version: version}, nil
-}
+//type Storage struct {
+//	pb.StorageServer
+//	db *gorm.DB
+//}
+//
+//func NewStorage(database *gorm.DB) (*Storage, error) {
+//	return &Storage{db: database}, nil
+//}
+//func (a *Storage) GetVersion(context.Context, *empty.Empty) (*pb.VersionResponse, error) {
+//	return &pb.VersionResponse{Version: version}, nil
+//}
