@@ -1,8 +1,10 @@
 package main
 
 import (
+	models "atlas/storage/internal/model"
 	"atlas/storage/pkg/pb"
 	"atlas/storage/pkg/svc"
+	"gorm.io/driver/postgres"
 	"time"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
@@ -11,13 +13,13 @@ import (
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/infobloxopen/atlas-app-toolkit/gateway"
 	"github.com/infobloxopen/atlas-app-toolkit/requestid"
-	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
 	"google.golang.org/grpc/reflection"
+	"gorm.io/gorm"
 )
 
 func NewGRPCServer(logger *logrus.Logger, dbConnectionString string) (*grpc.Server, error) {
@@ -49,12 +51,20 @@ func NewGRPCServer(logger *logrus.Logger, dbConnectionString string) (*grpc.Serv
 	)
 
 	// create new postgres database
-	db, err := gorm.Open("postgres", dbConnectionString)
+	db, err := gorm.Open(postgres.Open(dbConnectionString), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}
+
+	if isInit := db.Migrator().HasTable(&models.Note{}); !isInit {
+		err := db.Migrator().CreateTable(&models.Note{})
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	// register service implementation with the grpcServer
-	s, err := svc.NewBasicServer(db)
+	s, err := svc.NewStorage(db)
 	if err != nil {
 		return nil, err
 	}

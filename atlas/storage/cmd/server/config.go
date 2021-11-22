@@ -19,6 +19,7 @@ const (
 	// Database
 	defaultDatabaseEnable = true
 	// DSN example: "postgres://postgres:postgres@postgres:5432/atlas_db?sslmode=disable"
+	//"host=localhost user=postgres password=postgres dbname=backend port=5432 sslmode=disable"
 	defaultDatabaseDSN      = ""
 	defaultDatabaseType     = "postgres"
 	defaultDatabaseAddress  = "0.0.0.0"
