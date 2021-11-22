@@ -36,7 +36,7 @@ func NewPortal() (*Portal, error) {
 	return &Portal{}, nil
 }
 func (a *Portal) GetVersion(context.Context, *empty.Empty) (*pb.VersionResponse, error) {
-	return nil, nil
+	return &pb.VersionResponse{Version: version}, nil
 }
 
 //func (a *Portal) mustEmbedUnimplementedPortalServer()  {
