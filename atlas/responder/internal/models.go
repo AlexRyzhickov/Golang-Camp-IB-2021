@@ -8,3 +8,8 @@ type Service struct {
 	ServiceUptime        time.Time
 	ServiceCountRequests uint
 }
+
+type Msg struct {
+	Id      string
+	Command string
+}

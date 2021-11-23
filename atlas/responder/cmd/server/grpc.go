@@ -61,7 +61,7 @@ func NewGRPCServer(logger *logrus.Logger) (*grpc.Server, error) {
 
 	go func() {
 		sub := &common.Subscription{
-			PubsubName: "messages2",
+			PubsubName: "messages",
 			Topic:      "neworder2",
 			Route:      "/orders2",
 		}

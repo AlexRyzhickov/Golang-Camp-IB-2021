@@ -4,11 +4,16 @@ import (
 	models "atlas/responder/internal"
 	"atlas/responder/pkg/pb"
 	"context"
+	"crypto/sha1"
+	"encoding/hex"
+	"encoding/json"
 	"errors"
 	dapr "github.com/dapr/go-sdk/client"
 	"github.com/dapr/go-sdk/service/common"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"log"
 	"os"
 	"sync"
@@ -79,16 +84,10 @@ func (a *Responder) GetInfo(ctx context.Context, in *pb.GetInfoRequest) (*pb.Get
 	}
 
 	if in.Service == "storage" {
-		data := []byte("ping")
-
-		if err := a.PublishMsg(ctx, data); err != nil {
+		if err := a.PublishMsg(ctx, "getInfo"); err != nil {
 			return nil, err
 		}
-
-		//if err := a.client.PublishEvent(ctx, pubsubName, topicName, data); err != nil {
-		//	return nil, err
-		//}
-		return nil, errors.New("hi")
+		return nil, errors.New(success)
 	}
 
 	return nil, errors.New(invalidServiceName)
@@ -172,10 +171,24 @@ func (a *Responder) SetMode(ctx context.Context, in *pb.GetModeRequest) (*pb.Get
 
 func (a *Responder) EventHandler(ctx context.Context, e *common.TopicEvent) (retry bool, err error) {
 	log.Printf("event - PubsubName: %s, Topic: %s, ID: %s, Data: %s", e.PubsubName, e.Topic, e.ID, e.Data)
+	//a.s.Load()
+
 	return false, nil
 }
 
-func (a *Responder) PublishMsg(ctx context.Context, data []byte) error {
+func (a *Responder) PublishMsg(ctx context.Context, command string) error {
+
+	msg := models.Msg{
+		Id:      getId(time.Now().String()),
+		Command: command,
+	}
+
+	data, err := json.Marshal(msg)
+
+	if err != nil {
+		return status.Error(codes.Unknown, "err")
+	}
+
 	client, err := dapr.NewClient()
 	if err != nil {
 		return err
@@ -187,4 +200,10 @@ func (a *Responder) PublishMsg(ctx context.Context, data []byte) error {
 	}
 
 	return nil
+}
+
+func getId(s string) string {
+	h := sha1.New()
+	h.Write([]byte(s))
+	return hex.EncodeToString(h.Sum(nil))
 }
