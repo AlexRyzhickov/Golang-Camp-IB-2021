@@ -22,9 +22,19 @@ run-db:
 .PHONY: run-storage
 run-storage:
 	@dapr run --app-id sub \
-       --app-protocol http \
-       --app-port 8080 \
-       --dapr-http-port 3500 \
-       --log-level debug \
-       --components-path ./config \
-       go run cmd/server/*.go
+           --app-protocol http \
+           --app-port 8080 \
+           --dapr-http-port 3500 \
+           --log-level debug \
+           --components-path ./config \
+           make run-storage-server
+
+.PHONY: run-storage-server
+run-storage-server:
+	@go run cmd/server/*.go \
+			--database.address=localhost \
+    		--database.port=5432  \
+    		--database.user=postgres \
+    		--database.password=postgres \
+    		--database.ssl=disable \
+    		--database.name=backend \
