@@ -143,7 +143,7 @@ func eventHandler(ctx context.Context, e *common.TopicEvent) (retry bool, err er
 	default:
 
 	}
-
+	log.Println(response)
 	if err := PublishMsg(ctx, id, response); err != nil {
 		return false, err
 	}

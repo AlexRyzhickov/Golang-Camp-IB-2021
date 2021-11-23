@@ -23,6 +23,7 @@ import (
 const invalidServiceName = "invalid service name"
 const emptyRequest = "empty Request"
 const success = "success"
+const errorMsg = "error"
 
 const (
 	// version is the current version of the service
@@ -37,7 +38,7 @@ var (
 
 type Responder struct {
 	pb.ResponderServer
-	s         *sync.Map
+	responses *sync.Map
 	logger    *logrus.Logger
 	responder models.Service
 	client    dapr.Client
@@ -63,7 +64,7 @@ func NewResponder(logger *logrus.Logger, s *sync.Map) (*Responder, error) {
 
 	return &Responder{
 		logger:    logger,
-		s:         s,
+		responses: s,
 		responder: getResponder(),
 		client:    client,
 	}, nil
@@ -84,10 +85,31 @@ func (a *Responder) GetInfo(ctx context.Context, in *pb.GetInfoRequest) (*pb.Get
 	}
 
 	if in.Service == "storage" {
-		if err := a.PublishMsg(ctx, "getInfo"); err != nil {
+		id := getId(time.Now().String())
+
+		if err := a.PublishMsg(ctx, id, "getInfo"); err != nil {
 			return nil, err
 		}
-		return nil, errors.New(success)
+
+		time.Sleep(time.Millisecond * 15)
+
+		var result interface{}
+
+		a.responses.Range(func(key interface{}, value interface{}) bool {
+			if key == id {
+				result = value
+				return false
+			}
+
+			return true
+		})
+
+		if result != nil {
+			a.responses.Delete(id)
+			return &pb.GetInfoResponse{Value: result.(map[string]string)["Value"]}, nil
+		}
+
+		return &pb.GetInfoResponse{Value: errorMsg}, nil
 	}
 
 	return nil, errors.New(invalidServiceName)
@@ -170,16 +192,23 @@ func (a *Responder) SetMode(ctx context.Context, in *pb.GetModeRequest) (*pb.Get
 }
 
 func (a *Responder) EventHandler(ctx context.Context, e *common.TopicEvent) (retry bool, err error) {
-	log.Printf("event - PubsubName: %s, Topic: %s, ID: %s, Data: %s", e.PubsubName, e.Topic, e.ID, e.Data)
-	//a.s.Load()
+	//log.Printf("event - PubsubName: %responses, Topic: %responses, ID: %responses, Data: %responses", e.PubsubName, e.Topic, e.ID, e.Data)
+
+	log.Println(e.Data)
+
+	var m map[string]string
+	json.Unmarshal([]byte(e.Data.(string)), &m)
+	log.Println(m["Id"])
+	//log.Println(m["Value"])
+	a.responses.Store(m["Id"], m)
 
 	return false, nil
 }
 
-func (a *Responder) PublishMsg(ctx context.Context, command string) error {
+func (a *Responder) PublishMsg(ctx context.Context, id, command string) error {
 
 	msg := models.Msg{
-		Id:      getId(time.Now().String()),
+		Id:      id,
 		Command: command,
 	}
 
@@ -189,13 +218,13 @@ func (a *Responder) PublishMsg(ctx context.Context, command string) error {
 		return status.Error(codes.Unknown, "err")
 	}
 
-	client, err := dapr.NewClient()
-	if err != nil {
-		return err
-	}
-	defer client.Close()
+	//client, err := dapr.NewClient()
+	//if err != nil {
+	//	return err
+	//}
+	//defer client.Close()
 
-	if err := client.PublishEvent(ctx, pubsubName, topicName, data); err != nil {
+	if err := a.client.PublishEvent(ctx, pubsubName, topicName, data); err != nil {
 		return err
 	}
 

@@ -12,4 +12,5 @@ type Service struct {
 type Msg struct {
 	Id      string
 	Command string
+	Value   interface{}
 }
