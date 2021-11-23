@@ -21,7 +21,7 @@ run-db:
 
 .PHONY: run-storage
 run-storage:
-	@dapr run --app-id sub \
+	@dapr run --app-id storage \
            --app-protocol http \
            --app-port 8080 \
            --dapr-http-port 3500 \
