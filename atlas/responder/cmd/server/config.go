@@ -7,7 +7,7 @@ const (
 
 	// Server
 	defaultServerAddress = "0.0.0.0"
-	defaultServerPort    = "9090"
+	defaultServerPort    = "9091"
 
 	// Gateway
 	defaultGatewayEnable      = true
