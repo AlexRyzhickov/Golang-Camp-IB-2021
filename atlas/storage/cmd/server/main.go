@@ -75,12 +75,6 @@ func ServeInternal(logger *logrus.Logger) error {
 	return s.Serve(nil, l)
 }
 
-var sub = &common.Subscription{
-	PubsubName: "messages",
-	Topic:      "neworder",
-	Route:      "/orders",
-}
-
 // ServeExternal builds and runs the server that listens on ServerAddress and GatewayAddress
 func ServeExternal(logger *logrus.Logger) error {
 
@@ -98,6 +92,12 @@ func ServeExternal(logger *logrus.Logger) error {
 		if err != nil {
 			logger.Fatalln(err)
 		}
+	}
+
+	sub := &common.Subscription{
+		PubsubName: "messages",
+		Topic:      "neworder",
+		Route:      "/orders",
 	}
 
 	s := daprd.NewService(":8080")
