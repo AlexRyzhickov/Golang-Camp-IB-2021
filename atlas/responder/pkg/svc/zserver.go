@@ -5,8 +5,13 @@ import (
 	"atlas/responder/pkg/pb"
 	"context"
 	"errors"
+	dapr "github.com/dapr/go-sdk/client"
+	"github.com/dapr/go-sdk/service/common"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/sirupsen/logrus"
+	"log"
+	"os"
+	"sync"
 	"time"
 )
 
@@ -19,10 +24,18 @@ const (
 	version = "0.0.1"
 )
 
+var (
+	// set the environment as instructions.
+	pubsubName = os.Getenv("DAPR_PUBSUB_NAME")
+	topicName  = "neworder"
+)
+
 type Responder struct {
 	pb.ResponderServer
+	s         *sync.Map
 	logger    *logrus.Logger
 	responder models.Service
+	client    dapr.Client
 }
 
 func getResponder() models.Service {
@@ -34,11 +47,20 @@ func getResponder() models.Service {
 	}
 }
 
-func NewResponder(logger *logrus.Logger) (*Responder, error) {
+func NewResponder(logger *logrus.Logger, s *sync.Map) (*Responder, error) {
+
+	client, err := dapr.NewClient()
+	if err != nil {
+		logger.Error(err)
+		return nil, err
+	}
+	//defer client.Close()
 
 	return &Responder{
 		logger:    logger,
+		s:         s,
 		responder: getResponder(),
+		client:    client,
 	}, nil
 }
 
@@ -57,7 +79,16 @@ func (a *Responder) GetInfo(ctx context.Context, in *pb.GetInfoRequest) (*pb.Get
 	}
 
 	if in.Service == "storage" {
+		data := []byte("ping")
 
+		if err := a.PublishMsg(ctx, data); err != nil {
+			return nil, err
+		}
+
+		//if err := a.client.PublishEvent(ctx, pubsubName, topicName, data); err != nil {
+		//	return nil, err
+		//}
+		return nil, errors.New("hi")
 	}
 
 	return nil, errors.New(invalidServiceName)
@@ -137,4 +168,23 @@ func (a *Responder) GetMode(ctx context.Context, in *pb.GetModeRequest) (*pb.Get
 
 func (a *Responder) SetMode(ctx context.Context, in *pb.GetModeRequest) (*pb.GetModeResponse, error) {
 	return nil, nil
+}
+
+func (a *Responder) EventHandler(ctx context.Context, e *common.TopicEvent) (retry bool, err error) {
+	log.Printf("event - PubsubName: %s, Topic: %s, ID: %s, Data: %s", e.PubsubName, e.Topic, e.ID, e.Data)
+	return false, nil
+}
+
+func (a *Responder) PublishMsg(ctx context.Context, data []byte) error {
+	client, err := dapr.NewClient()
+	if err != nil {
+		return err
+	}
+	defer client.Close()
+
+	if err := client.PublishEvent(ctx, pubsubName, topicName, data); err != nil {
+		return err
+	}
+
+	return nil
 }

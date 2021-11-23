@@ -3,6 +3,10 @@ package main
 import (
 	"atlas/responder/pkg/pb"
 	"atlas/responder/pkg/svc"
+	"github.com/dapr/go-sdk/service/common"
+	dapr "github.com/dapr/go-sdk/service/http"
+	"net/http"
+	"sync"
 	"time"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
@@ -47,13 +51,31 @@ func NewGRPCServer(logger *logrus.Logger) (*grpc.Server, error) {
 	)
 
 	// register service implementation with the grpcServer
-	s, err := svc.NewResponder(logger)
+	srv, err := svc.NewResponder(logger, &sync.Map{})
 	if err != nil {
 		return nil, err
 	}
-	pb.RegisterResponderServer(grpcServer, s)
+	pb.RegisterResponderServer(grpcServer, srv)
 	// Register reflection service on gRPC server.
 	reflection.Register(grpcServer)
+
+	go func() {
+		sub := &common.Subscription{
+			PubsubName: "messages2",
+			Topic:      "neworder2",
+			Route:      "/orders2",
+		}
+
+		s := dapr.NewService(":8088")
+
+		if err := s.AddTopicEventHandler(sub, srv.EventHandler); err != nil {
+			logger.Fatalf("error adding topic subscription: %v", err)
+		}
+
+		if err := s.Start(); err != nil && err != http.ErrServerClosed {
+			logger.Fatalf("error listenning: %v", err)
+		}
+	}()
 
 	return grpcServer, nil
 }

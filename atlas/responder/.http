@@ -1,8 +1,8 @@
 ###
-GET http://localhost:8080/responder/v1/version
+GET http://localhost:8082/responder/v1/version
 
 ###
-POST http://localhost:8080/responder/v1/getInfo
+POST http://localhost:8082/responder/v1/getInfo
 Content-Type: application/json
 
 {
@@ -10,11 +10,18 @@ Content-Type: application/json
 }
 
 ###
-
-POST http://localhost:8080/responder/v1/setInfo
+POST http://localhost:8082/responder/v1/setInfo
 Content-Type: application/json
 
 {
   "service": "responder",
   "value": "responder service description"
+}
+
+###
+POST http://localhost:8082/responder/v1/getInfo
+Content-Type: application/json
+
+{
+  "service": "storage"
 }
