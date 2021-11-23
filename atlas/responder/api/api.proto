@@ -105,7 +105,7 @@ message ResetRequest {
 }
 
 message ResetResponse {
-  string value = 1;
+  string msg = 1;
 }
 
 message GetModeRequest{

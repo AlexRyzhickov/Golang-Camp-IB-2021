@@ -6,7 +6,7 @@ POST http://localhost:8080/responder/v1/getInfo
 Content-Type: application/json
 
 {
-  "service": "portal"
+  "service": "responder"
 }
 
 ###
@@ -15,6 +15,6 @@ POST http://localhost:8080/responder/v1/setInfo
 Content-Type: application/json
 
 {
-  "service": "portal",
-  "value": "portal service description"
+  "service": "responder",
+  "value": "responder service description"
 }
