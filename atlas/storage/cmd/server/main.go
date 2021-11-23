@@ -3,18 +3,22 @@ package main
 import (
 	models "atlas/storage/internal/model"
 	"context"
+	"encoding/json"
 	"fmt"
+	dapr "github.com/dapr/go-sdk/client"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"log"
 	"net"
 	"net/http"
+	"os"
 	"strings"
-
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/pflag"
-	"github.com/spf13/viper"
 
 	"google.golang.org/protobuf/reflect/protoreflect"
 
@@ -24,6 +28,11 @@ import (
 
 	"github.com/dapr/go-sdk/service/common"
 	daprd "github.com/dapr/go-sdk/service/http"
+)
+
+var (
+	pubsubName = os.Getenv("DAPR_PUBSUB_NAME")
+	topicName  = "neworder2"
 )
 
 func main() {
@@ -115,7 +124,80 @@ func ServeExternal(logger *logrus.Logger) error {
 
 func eventHandler(ctx context.Context, e *common.TopicEvent) (retry bool, err error) {
 	log.Printf("event - PubsubName: %s, Topic: %s, ID: %s, Data: %s", e.PubsubName, e.Topic, e.ID, e.Data)
+
+	//var data map[string]interface{}
+	//bytes, err := json.Marshal(e.Data)
+	//if err != nil {
+	//	return false, err
+	//}
+	//err = json.Unmarshal(bytes, &data)
+	//if err != nil {
+	//	return false, err
+	//}
+	//log.Println(data)
+	//logger := NewLogger()
+	//_, ok := e.Data.(models.Msg)
+	//
+	//log.Fatalln(ok)
+	//logger.Fatal(ok)
+	//log.Println(data)
+	//
+	//if !ok {
+	//	return false, errors.New("assertion error")
+	//}
+
+	//if err := PublishMsg(ctx, data.Id, "hi from storage"); err != nil {
+	//	return false, err
+	//}
+
+	var m map[string]string
+	json.Unmarshal([]byte(e.Data.(string)), &m)
+	log.Println(m["Id"])
+
+	var value interface{}
+	id := m["Id"]
+	command := m["Command"]
+
+	switch command {
+	case "getInfo":
+		value = "storage service desc"
+	case "setInfo":
+
+	default:
+
+	}
+
+	if err := PublishMsg(ctx, id, value); err != nil {
+		return false, err
+	}
+
 	return false, nil
+}
+
+func PublishMsg(ctx context.Context, Id string, value interface{}) error {
+
+	response := models.StorageResponse{
+		Id:    Id,
+		Value: value,
+	}
+
+	data, err := json.Marshal(response)
+
+	if err != nil {
+		return status.Error(codes.Unknown, "err")
+	}
+
+	client, err := dapr.NewClient()
+	if err != nil {
+		return err
+	}
+	defer client.Close()
+
+	if err := client.PublishEvent(ctx, pubsubName, topicName, data); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func init() {
