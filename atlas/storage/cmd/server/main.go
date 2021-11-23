@@ -19,6 +19,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"google.golang.org/protobuf/reflect/protoreflect"
 
@@ -33,6 +34,7 @@ import (
 var (
 	pubsubName = os.Getenv("DAPR_PUBSUB_NAME")
 	topicName  = "neworder2"
+	storage    = getStorage()
 )
 
 func main() {
@@ -125,49 +127,24 @@ func ServeExternal(logger *logrus.Logger) error {
 func eventHandler(ctx context.Context, e *common.TopicEvent) (retry bool, err error) {
 	log.Printf("event - PubsubName: %s, Topic: %s, ID: %s, Data: %s", e.PubsubName, e.Topic, e.ID, e.Data)
 
-	//var data map[string]interface{}
-	//bytes, err := json.Marshal(e.Data)
-	//if err != nil {
-	//	return false, err
-	//}
-	//err = json.Unmarshal(bytes, &data)
-	//if err != nil {
-	//	return false, err
-	//}
-	//log.Println(data)
-	//logger := NewLogger()
-	//_, ok := e.Data.(models.Msg)
-	//
-	//log.Fatalln(ok)
-	//logger.Fatal(ok)
-	//log.Println(data)
-	//
-	//if !ok {
-	//	return false, errors.New("assertion error")
-	//}
-
-	//if err := PublishMsg(ctx, data.Id, "hi from storage"); err != nil {
-	//	return false, err
-	//}
-
 	var m map[string]string
 	json.Unmarshal([]byte(e.Data.(string)), &m)
 	log.Println(m["Id"])
 
-	var value interface{}
+	var response interface{}
 	id := m["Id"]
 	command := m["Command"]
 
 	switch command {
 	case "getInfo":
-		value = "storage service desc"
+		response = storage.ServiceDesc
 	case "setInfo":
-
+		//storage.
 	default:
 
 	}
 
-	if err := PublishMsg(ctx, id, value); err != nil {
+	if err := PublishMsg(ctx, id, response); err != nil {
 		return false, err
 	}
 
@@ -230,4 +207,13 @@ func setDBConnection() {
 		viper.GetString("database.address"), viper.GetString("database.port"),
 		viper.GetString("database.user"), viper.GetString("database.password"),
 		viper.GetString("database.ssl"), viper.GetString("database.name")))
+}
+
+func getStorage() models.Service {
+	return models.Service{
+		ServiceName:          "storage",
+		ServiceDesc:          "storage service desc",
+		ServiceUptime:        time.Now(),
+		ServiceCountRequests: 0,
+	}
 }
