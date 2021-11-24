@@ -10,6 +10,7 @@ import (
 	"errors"
 	"fmt"
 	"google.golang.org/grpc"
+	"strconv"
 
 	//dapr "github.com/dapr/go-sdk/client"
 	dapr "github.com/dapr/dapr/pkg/proto/runtime/v1"
@@ -28,16 +29,11 @@ const invalidServiceName = "invalid service name"
 const emptyRequest = "empty Request"
 const success = "success"
 const errorMsg = "error"
+const errorMissingResp = "missing repository response error"
 
 const (
 	// version is the current version of the service
 	version = "0.0.1"
-)
-
-var (
-// set the environment as instructions.
-//pubsubName = os.Getenv("DAPR_PUBSUB_NAME")
-//topicName  = "neworder"
 )
 
 type Responder struct {
@@ -61,11 +57,6 @@ func NewResponder(logger *logrus.Logger, s *sync.Map) (*Responder, error) {
 	os.Setenv("DAPR_PUBSUB_NAME", "messages")
 	os.Setenv("DAPR_GRPC_PORT", "43011")
 
-	//client, err := dapr.NewClient()
-	//if err != nil {
-	//	return nil, err
-	//}
-	//defer client.Close()
 	conn, err := grpc.Dial(fmt.Sprintf("0.0.0.0:%s", "43011"), grpc.WithInsecure())
 	if err != nil {
 		return nil, fmt.Errorf("failed to open atlas pubsub connection: %v", err)
@@ -95,30 +86,16 @@ func (a *Responder) GetInfo(ctx context.Context, in *pb.GetInfoRequest) (*pb.Get
 
 	if in.Service == "storage" {
 		id := getId(time.Now().String())
-
-		if err := a.PublishMsg(ctx, id, "getInfo"); err != nil {
+		if err := a.PublishMsg(ctx, id, "getInfo", nil); err != nil {
 			return nil, err
 		}
-
-		time.Sleep(time.Millisecond * 100)
-
-		var result interface{}
-
-		a.responses.Range(func(key interface{}, value interface{}) bool {
-			if key == id {
-				result = value
-				return false
-			}
-
-			return true
-		})
-
-		if result != nil {
-			a.responses.Delete(id)
-			return &pb.GetInfoResponse{Value: result.(map[string]string)["Value"]}, nil
+		time.Sleep(time.Millisecond * 15)
+		result, ok := a.responses.Load(id)
+		if !ok {
+			return &pb.GetInfoResponse{Value: errorMissingResp}, nil
 		}
-
-		return &pb.GetInfoResponse{Value: errorMsg}, nil
+		a.responses.Delete(id)
+		return &pb.GetInfoResponse{Value: result.(map[string]string)["Value"]}, nil
 	}
 
 	return nil, errors.New(invalidServiceName)
@@ -131,12 +108,21 @@ func (a *Responder) SetInfo(ctx context.Context, in *pb.SetInfoRequest) (*pb.Set
 
 	if in.Service == "responder" {
 		a.responder.ServiceDesc = in.Value
-
 		return &pb.SetInfoResponse{Msg: success}, nil
 	}
 
 	if in.Service == "storage" {
-
+		id := getId(time.Now().String())
+		if err := a.PublishMsg(ctx, id, "setInfo", in.Value); err != nil {
+			return nil, err
+		}
+		time.Sleep(time.Millisecond * 15)
+		result, ok := a.responses.Load(id)
+		if !ok {
+			return &pb.SetInfoResponse{Msg: errorMissingResp}, nil
+		}
+		a.responses.Delete(id)
+		return &pb.SetInfoResponse{Msg: result.(map[string]string)["Value"]}, nil
 	}
 
 	return nil, errors.New(invalidServiceName)
@@ -166,11 +152,26 @@ func (a *Responder) GetRequests(ctx context.Context, in *pb.GetRequestsRequest) 
 	}
 
 	if in.Service == "responder" {
-		return &pb.GetRequestsResponse{Value: int32(a.responder.ServiceCountRequests)}, nil
+		a.responder.ServiceCountRequests++
+		return &pb.GetRequestsResponse{Value: int32(int(a.responder.ServiceCountRequests))}, nil
 	}
 
 	if in.Service == "storage" {
-
+		id := getId(time.Now().String())
+		if err := a.PublishMsg(ctx, id, "getRequests", nil); err != nil {
+			return nil, err
+		}
+		time.Sleep(time.Millisecond * 15)
+		result, ok := a.responses.Load(id)
+		if !ok {
+			return nil, errors.New(errorMissingResp)
+		}
+		a.responses.Delete(id)
+		i, err := strconv.Atoi(result.(map[string]string)["Value"])
+		if err != nil {
+			return nil, err
+		}
+		return &pb.GetRequestsResponse{Value: int32(i)}, nil
 	}
 
 	return nil, errors.New(invalidServiceName)
@@ -182,11 +183,23 @@ func (a *Responder) Reset(ctx context.Context, in *pb.ResetRequest) (*pb.ResetRe
 	}
 
 	if in.Service == "responder" {
+		a.responder = getResponder()
 		return &pb.ResetResponse{Msg: success}, nil
 	}
 
 	if in.Service == "storage" {
-
+		id := getId(time.Now().String())
+		if err := a.PublishMsg(ctx, id, "reset", nil); err != nil {
+			return nil, err
+		}
+		time.Sleep(time.Millisecond * 15)
+		result, ok := a.responses.Load(id)
+		if !ok {
+			return nil, errors.New(errorMissingResp)
+		}
+		a.responses.Delete(id)
+		log.Println(result)
+		return &pb.ResetResponse{Msg: result.(map[string]string)["Value"]}, nil
 	}
 
 	return nil, errors.New(invalidServiceName)
@@ -204,19 +217,23 @@ func (a *Responder) EventHandler(ctx context.Context, e *common.TopicEvent) (ret
 	log.Printf("event - PubsubName: %s, Topic: %s, ID: %s, Data: %s", e.PubsubName, e.Topic, e.ID, e.Data)
 
 	var m map[string]string
-	json.Unmarshal([]byte(e.Data.(string)), &m)
-	log.Println(m["Id"])
-	//log.Println(m["Value"])
+	err = json.Unmarshal([]byte(e.Data.(string)), &m)
+
+	if err != nil {
+		return false, err
+	}
+
 	a.responses.Store(m["Id"], m)
 
 	return false, nil
 }
 
-func (a *Responder) PublishMsg(ctx context.Context, id, command string) error {
+func (a *Responder) PublishMsg(ctx context.Context, id, command string, value interface{}) error {
 
 	msg := models.Msg{
 		Id:      id,
 		Command: command,
+		Value:   value,
 	}
 
 	data, err := json.Marshal(msg)
@@ -224,18 +241,6 @@ func (a *Responder) PublishMsg(ctx context.Context, id, command string) error {
 	if err != nil {
 		return status.Error(codes.Unknown, "err")
 	}
-
-	//client, err := dapr.NewClient()
-	//if err != nil {
-	//	return err
-	//}
-	//defer client.Close()
-
-	//if err := a.client.PublishEvent(ctx, "messages", "neworder", data); err != nil {
-	//	return err
-	//}
-	//
-	//return nil
 
 	_, err = a.client.PublishEvent(context.Background(), &dapr.PublishEventRequest{
 		Topic:      "neworder",

@@ -25,3 +25,28 @@ Content-Type: application/json
 {
   "service": "storage"
 }
+
+###
+POST http://localhost:8082/responder/v1/setInfo
+Content-Type: application/json
+
+{
+  "service": "storage",
+  "value": "storage service desc"
+}
+
+###
+POST http://localhost:8082/responder/v1/getRequests
+Content-Type: application/json
+
+{
+  "service": "responder"
+}
+
+###
+POST http://localhost:8082/responder/v1/reset
+Content-Type: application/json
+
+{
+  "service": "storage"
+}
