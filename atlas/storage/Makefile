@@ -37,4 +37,14 @@ run-storage-server:
     		--database.user=postgres \
     		--database.password=postgres \
     		--database.ssl=disable \
-    		--database.name=backend \
+    		--database.name=backend
+
+.PHONY: run-dapr-storage
+run-dapr-storage:
+	@dapr run --app-id storage \
+           --app-protocol http \
+           --app-port 8080 \
+           --dapr-http-port 3500 \
+           --dapr-grpc-port 35787 \
+           --log-level debug \
+           --components-path ./config

@@ -5,11 +5,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	dapr "github.com/dapr/go-sdk/client"
+	//dapr "github.com/dapr/go-sdk/client"
+	dapr "github.com/dapr/dapr/pkg/proto/runtime/v1"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"gorm.io/driver/postgres"
@@ -32,9 +34,9 @@ import (
 )
 
 var (
-	pubsubName = os.Getenv("DAPR_PUBSUB_NAME")
-	topicName  = "neworder2"
-	storage    = getStorage()
+	//pubsubName = os.Getenv("DAPR_PUBSUB_NAME")
+	//topicName  = "neworder2"
+	storage = getStorage()
 )
 
 func main() {
@@ -164,15 +166,31 @@ func PublishMsg(ctx context.Context, Id string, value interface{}) error {
 		return status.Error(codes.Unknown, "err")
 	}
 
-	client, err := dapr.NewClient()
+	os.Setenv("DAPR_PUBSUB_NAME", "messages")
+	os.Setenv("DAPR_GRPC_PORT", "35787")
+
+	//client, err := dapr.NewClient()
+	//if err != nil {
+	//	return err
+	//}
+	//defer client.Close()
+
+	conn, err := grpc.Dial(fmt.Sprintf("0.0.0.0:%s", "35787"), grpc.WithInsecure())
 	if err != nil {
 		return err
 	}
-	defer client.Close()
 
-	if err := client.PublishEvent(ctx, pubsubName, topicName, data); err != nil {
-		return err
-	}
+	client := dapr.NewDaprClient(conn)
+
+	//if err := client.PublishEvent(ctx, "messages", "neworder2", data); err != nil {
+	//	return err
+	//}
+
+	_, err = client.PublishEvent(context.Background(), &dapr.PublishEventRequest{
+		PubsubName: "messages",
+		Topic:      "neworder2",
+		Data:       data,
+	})
 
 	return nil
 }
@@ -203,10 +221,11 @@ func forwardResponseOption(ctx context.Context, w http.ResponseWriter, resp prot
 
 // setDBConnection sets the db connection string
 func setDBConnection() {
-	viper.Set("database.dsn", fmt.Sprintf("host=%s port=%s user=%s password=%s sslmode=%s dbname=%s",
-		viper.GetString("database.address"), viper.GetString("database.port"),
-		viper.GetString("database.user"), viper.GetString("database.password"),
-		viper.GetString("database.ssl"), viper.GetString("database.name")))
+	viper.Set("database.dsn", "host=localhost user=postgres password=postgres dbname=backend port=5432 sslmode=disable")
+	//viper.Set("database.dsn", fmt.Sprintf("host=%s port=%s user=%s password=%s sslmode=%s dbname=%s",
+	//	viper.GetString("database.address"), viper.GetString("database.port"),
+	//	viper.GetString("database.user"), viper.GetString("database.password"),
+	//	viper.GetString("database.ssl"), viper.GetString("database.name")))
 }
 
 func getStorage() models.Service {
