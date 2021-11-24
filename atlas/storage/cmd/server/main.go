@@ -5,6 +5,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strconv"
+
 	//dapr "github.com/dapr/go-sdk/client"
 	dapr "github.com/dapr/dapr/pkg/proto/runtime/v1"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -32,6 +34,8 @@ import (
 	"github.com/dapr/go-sdk/service/common"
 	daprd "github.com/dapr/go-sdk/service/http"
 )
+
+const success = "success"
 
 var (
 	//pubsubName = os.Getenv("DAPR_PUBSUB_NAME")
@@ -133,15 +137,25 @@ func eventHandler(ctx context.Context, e *common.TopicEvent) (retry bool, err er
 	json.Unmarshal([]byte(e.Data.(string)), &m)
 	log.Println(m["Id"])
 
-	var response interface{}
 	id := m["Id"]
 	command := m["Command"]
 
+	var response interface{}
+
 	switch command {
 	case "getInfo":
+		storage.ServiceCountRequests++
 		response = storage.ServiceDesc
 	case "setInfo":
-		//storage.
+		storage.ServiceCountRequests++
+		storage.ServiceDesc = m["Value"]
+		response = success
+	case "getRequests":
+		storage.ServiceCountRequests++
+		response = strconv.Itoa(int(storage.ServiceCountRequests))
+	case "reset":
+		storage = getStorage()
+		response = success
 	default:
 
 	}
