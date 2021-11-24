@@ -5,10 +5,6 @@ import (
 	"atlas/responder/pkg/svc"
 	"github.com/dapr/go-sdk/service/common"
 	dapr "github.com/dapr/go-sdk/service/http"
-	"net/http"
-	"sync"
-	"time"
-
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_logrus "github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus"
 	grpc_validator "github.com/grpc-ecosystem/go-grpc-middleware/validator"
@@ -20,6 +16,9 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
 	"google.golang.org/grpc/reflection"
+	"net/http"
+	"sync"
+	"time"
 )
 
 func NewGRPCServer(logger *logrus.Logger) (*grpc.Server, error) {

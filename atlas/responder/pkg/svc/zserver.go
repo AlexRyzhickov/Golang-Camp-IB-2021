@@ -8,7 +8,11 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
-	dapr "github.com/dapr/go-sdk/client"
+	"fmt"
+	"google.golang.org/grpc"
+
+	//dapr "github.com/dapr/go-sdk/client"
+	dapr "github.com/dapr/dapr/pkg/proto/runtime/v1"
 	"github.com/dapr/go-sdk/service/common"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/sirupsen/logrus"
@@ -31,9 +35,9 @@ const (
 )
 
 var (
-	// set the environment as instructions.
-	pubsubName = os.Getenv("DAPR_PUBSUB_NAME")
-	topicName  = "neworder"
+// set the environment as instructions.
+//pubsubName = os.Getenv("DAPR_PUBSUB_NAME")
+//topicName  = "neworder"
 )
 
 type Responder struct {
@@ -41,7 +45,7 @@ type Responder struct {
 	responses *sync.Map
 	logger    *logrus.Logger
 	responder models.Service
-	client    dapr.Client
+	client    dapr.DaprClient
 }
 
 func getResponder() models.Service {
@@ -54,19 +58,24 @@ func getResponder() models.Service {
 }
 
 func NewResponder(logger *logrus.Logger, s *sync.Map) (*Responder, error) {
+	os.Setenv("DAPR_PUBSUB_NAME", "messages")
+	os.Setenv("DAPR_GRPC_PORT", "43011")
 
-	client, err := dapr.NewClient()
-	if err != nil {
-		logger.Error(err)
-		return nil, err
-	}
+	//client, err := dapr.NewClient()
+	//if err != nil {
+	//	return nil, err
+	//}
 	//defer client.Close()
+	conn, err := grpc.Dial(fmt.Sprintf("0.0.0.0:%s", "43011"), grpc.WithInsecure())
+	if err != nil {
+		return nil, fmt.Errorf("failed to open atlas pubsub connection: %v", err)
+	}
 
 	return &Responder{
 		logger:    logger,
 		responses: s,
 		responder: getResponder(),
-		client:    client,
+		client:    dapr.NewDaprClient(conn),
 	}, nil
 }
 
@@ -91,7 +100,7 @@ func (a *Responder) GetInfo(ctx context.Context, in *pb.GetInfoRequest) (*pb.Get
 			return nil, err
 		}
 
-		time.Sleep(time.Millisecond * 15)
+		time.Sleep(time.Millisecond * 100)
 
 		var result interface{}
 
@@ -192,9 +201,7 @@ func (a *Responder) SetMode(ctx context.Context, in *pb.GetModeRequest) (*pb.Get
 }
 
 func (a *Responder) EventHandler(ctx context.Context, e *common.TopicEvent) (retry bool, err error) {
-	//log.Printf("event - PubsubName: %responses, Topic: %responses, ID: %responses, Data: %responses", e.PubsubName, e.Topic, e.ID, e.Data)
-
-	log.Println(e.Data)
+	log.Printf("event - PubsubName: %s, Topic: %s, ID: %s, Data: %s", e.PubsubName, e.Topic, e.ID, e.Data)
 
 	var m map[string]string
 	json.Unmarshal([]byte(e.Data.(string)), &m)
@@ -224,11 +231,19 @@ func (a *Responder) PublishMsg(ctx context.Context, id, command string) error {
 	//}
 	//defer client.Close()
 
-	if err := a.client.PublishEvent(ctx, pubsubName, topicName, data); err != nil {
-		return err
-	}
+	//if err := a.client.PublishEvent(ctx, "messages", "neworder", data); err != nil {
+	//	return err
+	//}
+	//
+	//return nil
 
-	return nil
+	_, err = a.client.PublishEvent(context.Background(), &dapr.PublishEventRequest{
+		Topic:      "neworder",
+		Data:       data,
+		PubsubName: "messages",
+	})
+
+	return err
 }
 
 func getId(s string) string {

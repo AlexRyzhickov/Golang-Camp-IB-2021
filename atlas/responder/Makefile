@@ -32,3 +32,14 @@ run-responder:
            --log-level debug \
            --components-path ./config \
            go run cmd/server/*.go
+
+.PHONY: run-dapr
+run-dapr:
+	@dapr run --app-id responder \
+           --app-protocol http \
+           --app-port 8088 \
+           --dapr-http-port 3501 \
+           --dapr-grpc-port 43011 \
+           --log-level debug \
+           --components-path ./config \
+
