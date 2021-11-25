@@ -9,20 +9,19 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"google.golang.org/grpc"
+	"log"
+	"os"
 	"strconv"
+	"sync"
+	"time"
 
-	//dapr "github.com/dapr/go-sdk/client"
 	dapr "github.com/dapr/dapr/pkg/proto/runtime/v1"
 	"github.com/dapr/go-sdk/service/common"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"log"
-	"os"
-	"sync"
-	"time"
 )
 
 const (
