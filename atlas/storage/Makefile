@@ -32,7 +32,7 @@ run-storage:
 
 .PHONY: run-storage-server
 run-storage-server:
-	@export DAPR_PUBSUB_NAME=messages && go run cmd/server/*.go \
+	@export DAPR_PUBSUB_NAME=messages && export DAPR_GRPC_PORT=35787 && go run cmd/server/*.go \
 			--database.address=localhost \
     		--database.port=5432  \
     		--database.user=postgres \

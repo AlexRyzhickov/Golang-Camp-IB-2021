@@ -19,7 +19,11 @@ import (
 )
 
 const (
-	success = "success"
+	success  = "success"
+	errorMsg = "invalid commands for storage"
+	pubTopic = "neworder2"
+	subTopic = "neworder"
+	route    = "/orders"
 )
 
 type StoragePubSub struct {
@@ -31,8 +35,8 @@ type StoragePubSub struct {
 func NewStoragePubSub(db *gorm.DB) *StoragePubSub {
 	sub := &common.Subscription{
 		PubsubName: "messages",
-		Topic:      "neworder",
-		Route:      "/orders",
+		Topic:      subTopic,
+		Route:      route,
 	}
 
 	return &StoragePubSub{
@@ -53,6 +57,7 @@ func getStorage() models.Service {
 
 func (s *StoragePubSub) EventHandler(ctx context.Context, e *common.TopicEvent) (retry bool, err error) {
 	log.Printf("event - PubsubName: %s, Topic: %s, ID: %s, Data: %s", e.PubsubName, e.Topic, e.ID, e.Data)
+	s.storage.ServiceCountRequests++
 
 	var m map[string]string
 	json.Unmarshal([]byte(e.Data.(string)), &m)
@@ -65,14 +70,11 @@ func (s *StoragePubSub) EventHandler(ctx context.Context, e *common.TopicEvent) 
 
 	switch command {
 	case "getInfo":
-		s.storage.ServiceCountRequests++
 		response = s.storage.ServiceDesc
 	case "setInfo":
-		s.storage.ServiceCountRequests++
 		s.storage.ServiceDesc = m["Value"]
 		response = success
 	case "getRequests":
-		s.storage.ServiceCountRequests++
 		response = strconv.Itoa(int(s.storage.ServiceCountRequests))
 	case "reset":
 		s.storage = getStorage()
@@ -96,7 +98,6 @@ func (s *StoragePubSub) EventHandler(ctx context.Context, e *common.TopicEvent) 
 			Service: values[0],
 			Mode:    mode,
 		}
-		log.Println(note)
 		err = s.db.Model(&models.Note{}).Where("service = ?", note.Service).Update("mode", mode).Error
 		if err != nil {
 			return false, err
@@ -105,9 +106,9 @@ func (s *StoragePubSub) EventHandler(ctx context.Context, e *common.TopicEvent) 
 	case "getUptime":
 		response = time.Since(s.storage.ServiceUptime).String()
 	default:
-
+		response = errorMsg
 	}
-	log.Println(response)
+
 	if err := PublishMsg(ctx, id, response); err != nil {
 		return false, err
 	}
@@ -128,10 +129,7 @@ func PublishMsg(ctx context.Context, Id string, value interface{}) error {
 		return status.Error(codes.Unknown, "err")
 	}
 
-	os.Setenv("DAPR_PUBSUB_NAME", "messages")
-	os.Setenv("DAPR_GRPC_PORT", "35787")
-
-	conn, err := grpc.Dial(fmt.Sprintf("0.0.0.0:%s", "35787"), grpc.WithInsecure())
+	conn, err := grpc.Dial(fmt.Sprintf("0.0.0.0:%s", os.Getenv("DAPR_GRPC_PORT")), grpc.WithInsecure())
 	if err != nil {
 		return err
 	}
@@ -140,7 +138,7 @@ func PublishMsg(ctx context.Context, Id string, value interface{}) error {
 
 	_, err = client.PublishEvent(context.Background(), &dapr.PublishEventRequest{
 		PubsubName: "messages",
-		Topic:      "neworder2",
+		Topic:      pubTopic,
 		Data:       data,
 	})
 

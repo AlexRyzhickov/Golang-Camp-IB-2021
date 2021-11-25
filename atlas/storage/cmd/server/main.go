@@ -86,13 +86,6 @@ func ServeExternal(logger *logrus.Logger) error {
 		logger.Fatalln(err)
 	}
 
-	//if isInit := db.Migrator().HasTable(&models.Note{}); !isInit {
-	//	err := db.Migrator().CreateTable(&models.Note{})
-	//	if err != nil {
-	//		logger.Fatalln(err)
-	//	}
-	//}
-
 	s := svc.NewStoragePubSub(db)
 
 	service := daprd.NewService(":8080")
@@ -134,9 +127,8 @@ func forwardResponseOption(ctx context.Context, w http.ResponseWriter, resp prot
 
 // setDBConnection sets the db connection string
 func setDBConnection() {
-	viper.Set("database.dsn", "host=localhost user=postgres password=postgres dbname=backend port=5432 sslmode=disable")
-	//viper.Set("database.dsn", fmt.Sprintf("host=%s port=%s user=%s password=%s sslmode=%s dbname=%s",
-	//	viper.GetString("database.address"), viper.GetString("database.port"),
-	//	viper.GetString("database.user"), viper.GetString("database.password"),
-	//	viper.GetString("database.ssl"), viper.GetString("database.name")))
+	viper.Set("database.dsn", fmt.Sprintf("host=%s port=%s user=%s password=%s sslmode=%s dbname=%s",
+		viper.GetString("database.address"), viper.GetString("database.port"),
+		viper.GetString("database.user"), viper.GetString("database.password"),
+		viper.GetString("database.ssl"), viper.GetString("database.name")))
 }
