@@ -19,11 +19,19 @@ import (
 )
 
 const (
-	success  = "success"
-	errorMsg = "invalid commands for storage"
-	pubTopic = "neworder2"
-	subTopic = "neworder"
-	route    = "/orders"
+	getInfo         = "getInfo"
+	setInfo         = "setInfo"
+	getRequests     = "getRequests"
+	reset           = "reset"
+	getMode         = "getMode"
+	setMode         = "setMode"
+	getUptime       = "getUptime"
+	success         = "success"
+	errorMsg        = "invalid commands for storage"
+	hiddenUptimeMsg = "uptime is hidden, mode = false"
+	pubTopic        = "neworder2"
+	subTopic        = "neworder"
+	route           = "/orders"
 )
 
 type StoragePubSub struct {
@@ -69,17 +77,17 @@ func (s *StoragePubSub) EventHandler(ctx context.Context, e *common.TopicEvent) 
 	var response interface{}
 
 	switch command {
-	case "getInfo":
+	case getInfo:
 		response = s.storage.ServiceDesc
-	case "setInfo":
+	case setInfo:
 		s.storage.ServiceDesc = m["Value"]
 		response = success
-	case "getRequests":
+	case getRequests:
 		response = strconv.Itoa(int(s.storage.ServiceCountRequests))
-	case "reset":
+	case reset:
 		s.storage = getStorage()
 		response = success
-	case "getMode":
+	case getMode:
 		serviceName := m["Value"]
 		note := models.Note{
 			Service: serviceName,
@@ -88,7 +96,7 @@ func (s *StoragePubSub) EventHandler(ctx context.Context, e *common.TopicEvent) 
 			return false, err
 		}
 		response = strconv.FormatBool(note.Mode)
-	case "setMode":
+	case setMode:
 		values := strings.Split(m["Value"], "&")
 		mode, err := strconv.ParseBool(values[1])
 		if err != nil {
@@ -103,8 +111,18 @@ func (s *StoragePubSub) EventHandler(ctx context.Context, e *common.TopicEvent) 
 			return false, err
 		}
 		response = success
-	case "getUptime":
-		response = time.Since(s.storage.ServiceUptime).String()
+	case getUptime:
+		serviceName := m["Value"]
+		note := models.Note{
+			Service: serviceName,
+		}
+		if err := s.db.First(&note).Error; err != nil {
+			return false, err
+		}
+		if note.Mode {
+			response = time.Since(s.storage.ServiceUptime).String()
+		}
+		response = hiddenUptimeMsg
 	default:
 		response = errorMsg
 	}
@@ -117,7 +135,6 @@ func (s *StoragePubSub) EventHandler(ctx context.Context, e *common.TopicEvent) 
 }
 
 func PublishMsg(ctx context.Context, Id string, value interface{}) error {
-
 	response := models.StorageResponse{
 		Id:    Id,
 		Value: value,
