@@ -85,10 +85,6 @@ func (s *StoragePubSub) EventHandler(ctx context.Context, e *common.TopicEvent) 
 		if err := s.db.First(&note).Error; err != nil {
 			return false, err
 		}
-
-		if serviceName == "storage" || serviceName == "responder" || serviceName == "portal" {
-
-		}
 		response = strconv.FormatBool(note.Mode)
 	case "setMode":
 		values := strings.Split(m["Value"], "&")
@@ -102,11 +98,12 @@ func (s *StoragePubSub) EventHandler(ctx context.Context, e *common.TopicEvent) 
 		}
 		log.Println(note)
 		err = s.db.Model(&models.Note{}).Where("service = ?", note.Service).Update("mode", mode).Error
-		//err = s.db.Model(&note).Updates(models.Note{Mode: note.Mode}).Error
 		if err != nil {
 			return false, err
 		}
 		response = success
+	case "getUptime":
+		response = time.Since(s.storage.ServiceUptime).String()
 	default:
 
 	}
