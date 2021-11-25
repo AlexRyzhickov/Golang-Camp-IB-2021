@@ -30,6 +30,7 @@ const emptyRequest = "empty Request"
 const success = "success"
 const errorMsg = "error"
 const errorMissingResp = "missing repository response error"
+const hiddenUptimeMsg = "uptime is hidden, mode = false"
 
 const (
 	// version is the current version of the service
@@ -133,14 +134,42 @@ func (a *Responder) GetUptime(ctx context.Context, in *pb.GetUptimeRequest) (*pb
 		return nil, errors.New(emptyRequest)
 	}
 
-	if in.Service == "responder" {
-		return &pb.GetUptimeResponse{
-			Value: time.Since(a.responder.ServiceUptime).String(),
-		}, nil
-	}
+	if in.Service == "storage" || in.Service == "responder" || in.Service == "portal" {
+		id := getId(time.Now().String())
+		if err := a.PublishMsg(ctx, id, "getMode", in.Service); err != nil {
+			return nil, err
+		}
+		time.Sleep(time.Millisecond * 15)
+		result, ok := a.responses.Load(id)
+		if !ok {
+			return nil, errors.New(errorMissingResp)
+		}
+		a.responses.Delete(id)
+		mode := result.(map[string]string)["Value"]
 
-	if in.Service == "storage" {
+		if mode == "false" {
+			return &pb.GetUptimeResponse{Value: hiddenUptimeMsg}, nil
+		}
 
+		if mode == "true" && in.Service == "responder" {
+			return &pb.GetUptimeResponse{Value: time.Since(a.responder.ServiceUptime).String()}, nil
+		}
+
+		if mode == "true" && in.Service == "storage" {
+			id := getId(time.Now().String())
+			if err := a.PublishMsg(ctx, id, "getUptime", nil); err != nil {
+				return nil, err
+			}
+			time.Sleep(time.Millisecond * 15)
+			result, ok := a.responses.Load(id)
+			if !ok {
+				return nil, errors.New(errorMissingResp)
+			}
+			a.responses.Delete(id)
+			return &pb.GetUptimeResponse{Value: result.(map[string]string)["Value"]}, nil
+		}
+
+		return nil, errors.New("invalid value from storage")
 	}
 
 	return nil, errors.New(invalidServiceName)
