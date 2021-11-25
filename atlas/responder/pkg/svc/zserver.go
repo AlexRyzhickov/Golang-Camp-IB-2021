@@ -157,6 +157,10 @@ func (a *Responder) GetUptime(ctx context.Context, in *pb.GetUptimeRequest) (*pb
 			return &pb.GetUptimeResponse{Value: hiddenUptimeMsg}, nil
 		}
 
+		if mode == "true" && in.Service == "portal" {
+			return &pb.GetUptimeResponse{Value: mode}, nil
+		}
+
 		if mode == "true" && in.Service == "responder" {
 			return &pb.GetUptimeResponse{Value: time.Since(a.responder.ServiceUptime).String()}, nil
 		}
