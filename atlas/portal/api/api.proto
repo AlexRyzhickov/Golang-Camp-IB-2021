@@ -1,11 +1,11 @@
 syntax = "proto3";
 package pb;
-option go_package = "atlas/portal/pkg/pb";
+option go_package = "atlas/responder/pkg/pb";
 
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 
-service Portal {
+service Portal{
   rpc GetVersion (google.protobuf.Empty) returns (VersionResponse) {
     option (google.api.http) = {
       get: "/version"
@@ -54,7 +54,7 @@ service Portal {
     };
   }
 
-  rpc SetMode (GetModeRequest) returns (GetModeResponse) {
+  rpc SetMode (SetModeRequest) returns (SetModeResponse) {
     option (google.api.http) = {
       post: "/setMode"
       body: "*"
@@ -105,7 +105,7 @@ message ResetRequest {
 }
 
 message ResetResponse {
-  string value = 1;
+  string msg = 1;
 }
 
 message GetModeRequest{
@@ -113,7 +113,7 @@ message GetModeRequest{
 }
 
 message GetModeResponse  {
-  bool mode = 1;
+  string mode = 1;
 }
 
 message SetModeRequest{

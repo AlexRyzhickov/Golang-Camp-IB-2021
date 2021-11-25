@@ -1,7 +1,7 @@
 package main
 
 import (
-	"atlas/portal/pkg/pb"
+	pb "atlas/portal/pkg/responderpb"
 	"atlas/portal/pkg/svc"
 	"github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus"
@@ -46,11 +46,11 @@ func NewGRPCServer(logger *logrus.Logger) (*grpc.Server, error) {
 	)
 
 	// register service implementation with the grpcServer
-	s, err := svc.NewPortal()
+	s, err := svc.NewPortal(logger)
 	if err != nil {
 		return nil, err
 	}
-	pb.RegisterPortalServer(grpcServer, s)
+	pb.RegisterResponderServer(grpcServer, s)
 	// Register reflection service on gRPC server.
 	reflection.Register(grpcServer)
 

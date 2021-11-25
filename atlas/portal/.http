@@ -1,20 +1,77 @@
 ###
-GET http://localhost:8080/portal/v1/version
+GET http://localhost:8060/portal/v1/version
 
 ###
-POST http://localhost:8080/portal/v1/getInfo
+POST http://localhost:8060/portal/v1/getInfo
 Content-Type: application/json
 
 {
-  "service": "portal"
+  "service": "responder"
 }
 
 ###
-
-POST http://localhost:8080/portal/v1/setInfo
+POST http://localhost:8060/portal/v1/setInfo
 Content-Type: application/json
 
 {
-  "service": "portal",
-  "value": "portal service description"
+  "service": "responder",
+  "value": "responder service description"
+}
+
+###
+POST http://localhost:8060/portal/v1/getInfo
+Content-Type: application/json
+
+{
+  "service": "storage"
+}
+
+###
+POST http://localhost:8060/portal/v1/setInfo
+Content-Type: application/json
+
+{
+  "service": "storage",
+  "value": "storage service desc"
+}
+
+###
+POST http://localhost:8060/portal/v1/getRequests
+Content-Type: application/json
+
+{
+  "service": "responder"
+}
+
+###
+POST http://localhost:8060/portal/v1/reset
+Content-Type: application/json
+
+{
+  "service": "responder"
+}
+
+###
+POST http://localhost:8060/portal/v1/getMode
+Content-Type: application/json
+
+{
+  "service": "storage"
+}
+
+###
+POST http://localhost:8060/portal/v1/setMode
+Content-Type: application/json
+
+{
+  "service": "storage",
+  "mode": true
+}
+
+###
+POST http://localhost:8060/portal/v1/getUptime
+Content-Type: application/json
+
+{
+  "service": "storage"
 }

@@ -255,7 +255,7 @@ func local_request_Portal_GetMode_0(ctx context.Context, marshaler runtime.Marsh
 }
 
 func request_Portal_SetMode_0(ctx context.Context, marshaler runtime.Marshaler, client PortalClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq GetModeRequest
+	var protoReq SetModeRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -272,7 +272,7 @@ func request_Portal_SetMode_0(ctx context.Context, marshaler runtime.Marshaler, 
 }
 
 func local_request_Portal_SetMode_0(ctx context.Context, marshaler runtime.Marshaler, server PortalServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq GetModeRequest
+	var protoReq SetModeRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
