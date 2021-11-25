@@ -3,6 +3,7 @@ package svc
 import (
 	models "atlas/portal/internal"
 	"atlas/portal/pkg/pb"
+	responderpb "atlas/responder/pkg/pb"
 	"context"
 	"errors"
 	"github.com/golang/protobuf/ptypes/empty"
@@ -25,7 +26,7 @@ const (
 
 type Portal struct {
 	pb.PortalServer
-	client pb.PortalClient
+	client responderpb.ResponderClient
 	logger *logrus.Logger
 	portal models.Service
 }
@@ -46,7 +47,8 @@ func NewPortal(logger *logrus.Logger) (*Portal, error) {
 		logger.Fatalf("\nDid not connect %v\n", err)
 	}
 
-	client := pb.NewPortalClient(conn)
+	//client := pb.NewPortalClient(conn)
+	client := responderpb.NewResponderClient(conn)
 
 	return &Portal{client: client,
 		logger: logger,
@@ -69,11 +71,11 @@ func (p *Portal) GetInfo(ctx context.Context, in *pb.GetInfoRequest) (*pb.GetInf
 	}
 
 	if in.Service == "responder" || in.Service == "storage" {
-		resp, err := p.client.GetInfo(ctx, in)
+		resp, err := p.client.GetInfo(ctx, &responderpb.GetInfoRequest{Service: in.Service})
 		if err != nil {
 			return nil, err
 		}
-		return resp, nil
+		return &pb.GetInfoResponse{Value: resp.Value}, nil
 	}
 
 	return nil, errors.New(invalidServiceName)
@@ -91,11 +93,11 @@ func (p *Portal) SetInfo(ctx context.Context, in *pb.SetInfoRequest) (*pb.SetInf
 	}
 
 	if in.Service == "responder" || in.Service == "storage" {
-		resp, err := p.client.SetInfo(ctx, in)
+		resp, err := p.client.SetInfo(ctx, &responderpb.SetInfoRequest{Service: in.Service, Value: in.Value})
 		if err != nil {
 			return nil, err
 		}
-		return resp, nil
+		return &pb.SetInfoResponse{Msg: resp.Msg}, nil
 	}
 
 	return nil, errors.New(invalidServiceName)
@@ -111,7 +113,7 @@ func (p *Portal) GetUptime(ctx context.Context, in *pb.GetUptimeRequest) (*pb.Ge
 	}
 
 	if in.Service == "portal" || in.Service == "responder" || in.Service == "storage" {
-		resp, err := p.client.GetUptime(ctx, in)
+		resp, err := p.client.GetUptime(ctx, &responderpb.GetUptimeRequest{Service: in.Service})
 		if err != nil {
 			return nil, err
 		}
@@ -125,7 +127,7 @@ func (p *Portal) GetUptime(ctx context.Context, in *pb.GetUptimeRequest) (*pb.Ge
 			}
 		}
 
-		return resp, nil
+		return &pb.GetUptimeResponse{Value: resp.Value}, nil
 	}
 
 	return nil, errors.New(invalidServiceName)
@@ -143,11 +145,11 @@ func (p *Portal) GetRequests(ctx context.Context, in *pb.GetRequestsRequest) (*p
 	}
 
 	if in.Service == "responder" || in.Service == "storage" {
-		resp, err := p.client.GetRequests(ctx, in)
+		resp, err := p.client.GetRequests(ctx, &responderpb.GetRequestsRequest{Service: in.Service})
 		if err != nil {
 			return nil, err
 		}
-		return resp, nil
+		return &pb.GetRequestsResponse{Value: resp.Value}, nil
 	}
 
 	return nil, errors.New(invalidServiceName)
@@ -165,11 +167,11 @@ func (p *Portal) Reset(ctx context.Context, in *pb.ResetRequest) (*pb.ResetRespo
 	}
 
 	if in.Service == "responder" || in.Service == "storage" {
-		resp, err := p.client.Reset(ctx, in)
+		resp, err := p.client.Reset(ctx, &responderpb.ResetRequest{Service: in.Service})
 		if err != nil {
 			return nil, err
 		}
-		return resp, nil
+		return &pb.ResetResponse{Msg: resp.Msg}, nil
 	}
 
 	return nil, errors.New(invalidServiceName)
@@ -185,11 +187,11 @@ func (p *Portal) GetMode(ctx context.Context, in *pb.GetModeRequest) (*pb.GetMod
 	}
 
 	if in.Service == "portal" || in.Service == "responder" || in.Service == "storage" {
-		resp, err := p.client.GetMode(ctx, in)
+		resp, err := p.client.GetMode(ctx, &responderpb.GetModeRequest{Service: in.Service})
 		if err != nil {
 			return nil, err
 		}
-		return resp, nil
+		return &pb.GetModeResponse{Mode: resp.Mode}, nil
 	}
 
 	return nil, errors.New(invalidServiceName)
@@ -205,11 +207,11 @@ func (p *Portal) SetMode(ctx context.Context, in *pb.SetModeRequest) (*pb.SetMod
 	}
 
 	if in.Service == "portal" || in.Service == "responder" || in.Service == "storage" {
-		resp, err := p.client.SetMode(ctx, in)
+		resp, err := p.client.SetMode(ctx, &responderpb.SetModeRequest{Service: in.Service, Mode: in.Mode})
 		if err != nil {
 			return nil, err
 		}
-		return resp, nil
+		return &pb.SetModeResponse{Msg: resp.Msg}, nil
 	}
 
 	return nil, errors.New(invalidServiceName)

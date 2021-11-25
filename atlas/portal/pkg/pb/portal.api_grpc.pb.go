@@ -39,7 +39,7 @@ func NewPortalClient(cc grpc.ClientConnInterface) PortalClient {
 
 func (c *portalClient) GetVersion(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*VersionResponse, error) {
 	out := new(VersionResponse)
-	err := c.cc.Invoke(ctx, "/pb.Portal/GetVersion", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/portal.pb.Portal/GetVersion", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +48,7 @@ func (c *portalClient) GetVersion(ctx context.Context, in *empty.Empty, opts ...
 
 func (c *portalClient) GetInfo(ctx context.Context, in *GetInfoRequest, opts ...grpc.CallOption) (*GetInfoResponse, error) {
 	out := new(GetInfoResponse)
-	err := c.cc.Invoke(ctx, "/pb.Portal/GetInfo", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/portal.pb.Portal/GetInfo", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func (c *portalClient) GetInfo(ctx context.Context, in *GetInfoRequest, opts ...
 
 func (c *portalClient) SetInfo(ctx context.Context, in *SetInfoRequest, opts ...grpc.CallOption) (*SetInfoResponse, error) {
 	out := new(SetInfoResponse)
-	err := c.cc.Invoke(ctx, "/pb.Portal/SetInfo", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/portal.pb.Portal/SetInfo", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +66,7 @@ func (c *portalClient) SetInfo(ctx context.Context, in *SetInfoRequest, opts ...
 
 func (c *portalClient) GetUptime(ctx context.Context, in *GetUptimeRequest, opts ...grpc.CallOption) (*GetUptimeResponse, error) {
 	out := new(GetUptimeResponse)
-	err := c.cc.Invoke(ctx, "/pb.Portal/GetUptime", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/portal.pb.Portal/GetUptime", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +75,7 @@ func (c *portalClient) GetUptime(ctx context.Context, in *GetUptimeRequest, opts
 
 func (c *portalClient) GetRequests(ctx context.Context, in *GetRequestsRequest, opts ...grpc.CallOption) (*GetRequestsResponse, error) {
 	out := new(GetRequestsResponse)
-	err := c.cc.Invoke(ctx, "/pb.Portal/GetRequests", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/portal.pb.Portal/GetRequests", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +84,7 @@ func (c *portalClient) GetRequests(ctx context.Context, in *GetRequestsRequest, 
 
 func (c *portalClient) Reset(ctx context.Context, in *ResetRequest, opts ...grpc.CallOption) (*ResetResponse, error) {
 	out := new(ResetResponse)
-	err := c.cc.Invoke(ctx, "/pb.Portal/Reset", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/portal.pb.Portal/Reset", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +93,7 @@ func (c *portalClient) Reset(ctx context.Context, in *ResetRequest, opts ...grpc
 
 func (c *portalClient) GetMode(ctx context.Context, in *GetModeRequest, opts ...grpc.CallOption) (*GetModeResponse, error) {
 	out := new(GetModeResponse)
-	err := c.cc.Invoke(ctx, "/pb.Portal/GetMode", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/portal.pb.Portal/GetMode", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +102,7 @@ func (c *portalClient) GetMode(ctx context.Context, in *GetModeRequest, opts ...
 
 func (c *portalClient) SetMode(ctx context.Context, in *SetModeRequest, opts ...grpc.CallOption) (*SetModeResponse, error) {
 	out := new(SetModeResponse)
-	err := c.cc.Invoke(ctx, "/pb.Portal/SetMode", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/portal.pb.Portal/SetMode", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -175,7 +175,7 @@ func _Portal_GetVersion_Handler(srv interface{}, ctx context.Context, dec func(i
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.Portal/GetVersion",
+		FullMethod: "/portal.pb.Portal/GetVersion",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PortalServer).GetVersion(ctx, req.(*empty.Empty))
@@ -193,7 +193,7 @@ func _Portal_GetInfo_Handler(srv interface{}, ctx context.Context, dec func(inte
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.Portal/GetInfo",
+		FullMethod: "/portal.pb.Portal/GetInfo",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PortalServer).GetInfo(ctx, req.(*GetInfoRequest))
@@ -211,7 +211,7 @@ func _Portal_SetInfo_Handler(srv interface{}, ctx context.Context, dec func(inte
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.Portal/SetInfo",
+		FullMethod: "/portal.pb.Portal/SetInfo",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PortalServer).SetInfo(ctx, req.(*SetInfoRequest))
@@ -229,7 +229,7 @@ func _Portal_GetUptime_Handler(srv interface{}, ctx context.Context, dec func(in
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.Portal/GetUptime",
+		FullMethod: "/portal.pb.Portal/GetUptime",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PortalServer).GetUptime(ctx, req.(*GetUptimeRequest))
@@ -247,7 +247,7 @@ func _Portal_GetRequests_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.Portal/GetRequests",
+		FullMethod: "/portal.pb.Portal/GetRequests",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PortalServer).GetRequests(ctx, req.(*GetRequestsRequest))
@@ -265,7 +265,7 @@ func _Portal_Reset_Handler(srv interface{}, ctx context.Context, dec func(interf
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.Portal/Reset",
+		FullMethod: "/portal.pb.Portal/Reset",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PortalServer).Reset(ctx, req.(*ResetRequest))
@@ -283,7 +283,7 @@ func _Portal_GetMode_Handler(srv interface{}, ctx context.Context, dec func(inte
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.Portal/GetMode",
+		FullMethod: "/portal.pb.Portal/GetMode",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PortalServer).GetMode(ctx, req.(*GetModeRequest))
@@ -301,7 +301,7 @@ func _Portal_SetMode_Handler(srv interface{}, ctx context.Context, dec func(inte
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.Portal/SetMode",
+		FullMethod: "/portal.pb.Portal/SetMode",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PortalServer).SetMode(ctx, req.(*SetModeRequest))
@@ -313,7 +313,7 @@ func _Portal_SetMode_Handler(srv interface{}, ctx context.Context, dec func(inte
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Portal_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "pb.Portal",
+	ServiceName: "portal.pb.Portal",
 	HandlerType: (*PortalServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -350,5 +350,5 @@ var Portal_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "api.proto",
+	Metadata: "portal.api.proto",
 }

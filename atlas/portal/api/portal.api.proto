@@ -1,6 +1,6 @@
 syntax = "proto3";
-package pb;
-option go_package = "atlas/responder/pkg/pb";
+package portal.pb;
+option go_package = "atlas/portal/pkg/pb";
 
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
