@@ -9,7 +9,6 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
-	"log"
 	"time"
 )
 
@@ -22,6 +21,9 @@ const (
 	errorMsg           = "error"
 	errorMissingResp   = "missing repository response error"
 	hiddenUptimeMsg    = "uptime is hidden, mode = false"
+	portal             = "portal"
+	responder          = "responder"
+	storage            = "storage"
 )
 
 type Portal struct {
@@ -42,15 +44,14 @@ func getPortal() models.Service {
 
 func NewPortal(logger *logrus.Logger) (*Portal, error) {
 	conn, err := grpc.Dial("0.0.0.0:9091" /*+os.Getenv("PORT")*/, grpc.WithInsecure(), grpc.WithBlock())
-	log.Println("Hi")
 	if err != nil {
 		logger.Fatalf("\nDid not connect %v\n", err)
 	}
 
-	//client := pb.NewPortalClient(conn)
 	client := responderpb.NewResponderClient(conn)
 
-	return &Portal{client: client,
+	return &Portal{
+		client: client,
 		logger: logger,
 		portal: getPortal(),
 	}, nil
@@ -65,12 +66,12 @@ func (p *Portal) GetInfo(ctx context.Context, in *pb.GetInfoRequest) (*pb.GetInf
 		return nil, errors.New(emptyRequest)
 	}
 
-	if in.Service == "portal" {
+	if in.Service == portal {
 		p.portal.ServiceCountRequests++
 		return &pb.GetInfoResponse{Value: p.portal.ServiceDesc}, nil
 	}
 
-	if in.Service == "responder" || in.Service == "storage" {
+	if in.Service == responder || in.Service == storage {
 		resp, err := p.client.GetInfo(ctx, &responderpb.GetInfoRequest{Service: in.Service})
 		if err != nil {
 			return nil, err
@@ -86,13 +87,13 @@ func (p *Portal) SetInfo(ctx context.Context, in *pb.SetInfoRequest) (*pb.SetInf
 		return nil, errors.New(emptyRequest)
 	}
 
-	if in.Service == "portal" {
+	if in.Service == portal {
 		p.portal.ServiceCountRequests++
 		p.portal.ServiceDesc = in.Value
 		return &pb.SetInfoResponse{Msg: success}, nil
 	}
 
-	if in.Service == "responder" || in.Service == "storage" {
+	if in.Service == responder || in.Service == storage {
 		resp, err := p.client.SetInfo(ctx, &responderpb.SetInfoRequest{Service: in.Service, Value: in.Value})
 		if err != nil {
 			return nil, err
@@ -108,17 +109,17 @@ func (p *Portal) GetUptime(ctx context.Context, in *pb.GetUptimeRequest) (*pb.Ge
 		return nil, errors.New(emptyRequest)
 	}
 
-	if in.Service == "portal" {
+	if in.Service == portal {
 		p.portal.ServiceCountRequests++
 	}
 
-	if in.Service == "portal" || in.Service == "responder" || in.Service == "storage" {
+	if in.Service == portal || in.Service == responder || in.Service == storage {
 		resp, err := p.client.GetUptime(ctx, &responderpb.GetUptimeRequest{Service: in.Service})
 		if err != nil {
 			return nil, err
 		}
 
-		if in.Service == "portal" {
+		if in.Service == portal {
 			if resp.Value == "true" {
 				return &pb.GetUptimeResponse{Value: time.Since(p.portal.ServiceUptime).String()}, nil
 			}
@@ -139,12 +140,12 @@ func (p *Portal) GetRequests(ctx context.Context, in *pb.GetRequestsRequest) (*p
 		return nil, errors.New(emptyRequest)
 	}
 
-	if in.Service == "portal" {
+	if in.Service == portal {
 		p.portal.ServiceCountRequests++
 		return &pb.GetRequestsResponse{Value: int32(int(p.portal.ServiceCountRequests))}, nil
 	}
 
-	if in.Service == "responder" || in.Service == "storage" {
+	if in.Service == responder || in.Service == storage {
 		resp, err := p.client.GetRequests(ctx, &responderpb.GetRequestsRequest{Service: in.Service})
 		if err != nil {
 			return nil, err
@@ -160,13 +161,13 @@ func (p *Portal) Reset(ctx context.Context, in *pb.ResetRequest) (*pb.ResetRespo
 		return nil, errors.New(emptyRequest)
 	}
 
-	if in.Service == "portal" {
+	if in.Service == portal {
 		p.portal.ServiceCountRequests++
 		p.portal = getPortal()
 		return &pb.ResetResponse{Msg: success}, nil
 	}
 
-	if in.Service == "responder" || in.Service == "storage" {
+	if in.Service == responder || in.Service == storage {
 		resp, err := p.client.Reset(ctx, &responderpb.ResetRequest{Service: in.Service})
 		if err != nil {
 			return nil, err
@@ -182,11 +183,11 @@ func (p *Portal) GetMode(ctx context.Context, in *pb.GetModeRequest) (*pb.GetMod
 		return nil, errors.New(emptyRequest)
 	}
 
-	if in.Service == "portal" {
+	if in.Service == portal {
 		p.portal.ServiceCountRequests++
 	}
 
-	if in.Service == "portal" || in.Service == "responder" || in.Service == "storage" {
+	if in.Service == portal || in.Service == responder || in.Service == storage {
 		resp, err := p.client.GetMode(ctx, &responderpb.GetModeRequest{Service: in.Service})
 		if err != nil {
 			return nil, err
@@ -202,11 +203,11 @@ func (p *Portal) SetMode(ctx context.Context, in *pb.SetModeRequest) (*pb.SetMod
 		return nil, errors.New(emptyRequest)
 	}
 
-	if in.Service == "portal" {
+	if in.Service == portal {
 		p.portal.ServiceCountRequests++
 	}
 
-	if in.Service == "portal" || in.Service == "responder" || in.Service == "storage" {
+	if in.Service == portal || in.Service == responder || in.Service == storage {
 		resp, err := p.client.SetMode(ctx, &responderpb.SetModeRequest{Service: in.Service, Mode: in.Mode})
 		if err != nil {
 			return nil, err
