@@ -1,7 +1,6 @@
 package main
 
 import (
-	models "atlas/storage/internal/model"
 	"atlas/storage/pkg/svc"
 	"context"
 	"fmt"
@@ -87,12 +86,12 @@ func ServeExternal(logger *logrus.Logger) error {
 		logger.Fatalln(err)
 	}
 
-	if isInit := db.Migrator().HasTable(&models.Note{}); !isInit {
-		err := db.Migrator().CreateTable(&models.Note{})
-		if err != nil {
-			logger.Fatalln(err)
-		}
-	}
+	//if isInit := db.Migrator().HasTable(&models.Note{}); !isInit {
+	//	err := db.Migrator().CreateTable(&models.Note{})
+	//	if err != nil {
+	//		logger.Fatalln(err)
+	//	}
+	//}
 
 	s := svc.NewStoragePubSub(db)
 

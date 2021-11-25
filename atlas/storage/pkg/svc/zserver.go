@@ -14,6 +14,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -78,10 +79,34 @@ func (s *StoragePubSub) EventHandler(ctx context.Context, e *common.TopicEvent) 
 		response = success
 	case "getMode":
 		serviceName := m["Value"]
+		note := models.Note{
+			Service: serviceName,
+		}
+		if err := s.db.First(&note).Error; err != nil {
+			return false, err
+		}
+
 		if serviceName == "storage" || serviceName == "responder" || serviceName == "portal" {
 
 		}
-		response = strconv.FormatBool(true)
+		response = strconv.FormatBool(note.Mode)
+	case "setMode":
+		values := strings.Split(m["Value"], "&")
+		mode, err := strconv.ParseBool(values[1])
+		if err != nil {
+			return false, err
+		}
+		note := models.Note{
+			Service: values[0],
+			Mode:    mode,
+		}
+		log.Println(note)
+		err = s.db.Model(&models.Note{}).Where("service = ?", note.Service).Update("mode", mode).Error
+		//err = s.db.Model(&note).Updates(models.Note{Mode: note.Mode}).Error
+		if err != nil {
+			return false, err
+		}
+		response = success
 	default:
 
 	}

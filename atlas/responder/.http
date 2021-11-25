@@ -58,3 +58,12 @@ Content-Type: application/json
 {
   "service": "storage"
 }
+
+###
+POST http://localhost:8082/responder/v1/setMode
+Content-Type: application/json
+
+{
+  "service": "storage",
+  "mode": false
+}

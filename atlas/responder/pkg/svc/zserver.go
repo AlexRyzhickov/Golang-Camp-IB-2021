@@ -205,6 +205,9 @@ func (a *Responder) Reset(ctx context.Context, in *pb.ResetRequest) (*pb.ResetRe
 }
 
 func (a *Responder) GetMode(ctx context.Context, in *pb.GetModeRequest) (*pb.GetModeResponse, error) {
+	if in == nil || in.Service == "" {
+		return nil, errors.New(emptyRequest)
+	}
 
 	if in.Service == "storage" || in.Service == "responder" || in.Service == "portal" {
 		id := getId(time.Now().String())
@@ -217,18 +220,38 @@ func (a *Responder) GetMode(ctx context.Context, in *pb.GetModeRequest) (*pb.Get
 			return nil, errors.New(errorMissingResp)
 		}
 		a.responses.Delete(id)
-		mode, err := strconv.ParseBool(result.(map[string]string)["Value"])
-		if err != nil {
-			return nil, err
+		mode := result.(map[string]string)["Value"]
+
+		if mode == "true" || mode == "false" {
+			return &pb.GetModeResponse{Mode: mode}, nil
 		}
-		return &pb.GetModeResponse{Mode: mode}, nil
+
+		return nil, errors.New("invalid value from storage")
 	}
 
-	return nil, nil
+	return nil, errors.New(invalidServiceName)
 }
 
-func (a *Responder) SetMode(ctx context.Context, in *pb.GetModeRequest) (*pb.GetModeResponse, error) {
-	return nil, nil
+func (a *Responder) SetMode(ctx context.Context, in *pb.SetModeRequest) (*pb.SetModeResponse, error) {
+	if in == nil || in.Service == "" {
+		return nil, errors.New(emptyRequest)
+	}
+
+	if in.Service == "storage" || in.Service == "responder" || in.Service == "portal" {
+		id := getId(time.Now().String())
+		if err := a.PublishMsg(ctx, id, "setMode", in.Service+"&"+strconv.FormatBool(in.Mode)); err != nil {
+			return nil, err
+		}
+		time.Sleep(time.Millisecond * 15)
+		result, ok := a.responses.Load(id)
+		if !ok {
+			return nil, errors.New(errorMissingResp)
+		}
+		a.responses.Delete(id)
+		return &pb.SetModeResponse{Msg: result.(map[string]string)["Value"]}, nil
+	}
+
+	return nil, errors.New(invalidServiceName)
 }
 
 func (a *Responder) EventHandler(ctx context.Context, e *common.TopicEvent) (retry bool, err error) {

@@ -255,7 +255,7 @@ func local_request_Responder_GetMode_0(ctx context.Context, marshaler runtime.Ma
 }
 
 func request_Responder_SetMode_0(ctx context.Context, marshaler runtime.Marshaler, client ResponderClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq GetModeRequest
+	var protoReq SetModeRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -272,7 +272,7 @@ func request_Responder_SetMode_0(ctx context.Context, marshaler runtime.Marshale
 }
 
 func local_request_Responder_SetMode_0(ctx context.Context, marshaler runtime.Marshaler, server ResponderServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq GetModeRequest
+	var protoReq SetModeRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)

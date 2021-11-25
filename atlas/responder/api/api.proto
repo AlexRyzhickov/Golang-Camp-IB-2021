@@ -54,7 +54,7 @@ service Responder {
     };
   }
 
-  rpc SetMode (GetModeRequest) returns (GetModeResponse) {
+  rpc SetMode (SetModeRequest) returns (SetModeResponse) {
     option (google.api.http) = {
       post: "/setMode"
       body: "*"
@@ -113,7 +113,7 @@ message GetModeRequest{
 }
 
 message GetModeResponse  {
-  bool mode = 1;
+  string mode = 1;
 }
 
 message SetModeRequest{

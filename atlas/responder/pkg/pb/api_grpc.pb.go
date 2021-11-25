@@ -26,7 +26,7 @@ type ResponderClient interface {
 	GetRequests(ctx context.Context, in *GetRequestsRequest, opts ...grpc.CallOption) (*GetRequestsResponse, error)
 	Reset(ctx context.Context, in *ResetRequest, opts ...grpc.CallOption) (*ResetResponse, error)
 	GetMode(ctx context.Context, in *GetModeRequest, opts ...grpc.CallOption) (*GetModeResponse, error)
-	SetMode(ctx context.Context, in *GetModeRequest, opts ...grpc.CallOption) (*GetModeResponse, error)
+	SetMode(ctx context.Context, in *SetModeRequest, opts ...grpc.CallOption) (*SetModeResponse, error)
 }
 
 type responderClient struct {
@@ -100,8 +100,8 @@ func (c *responderClient) GetMode(ctx context.Context, in *GetModeRequest, opts 
 	return out, nil
 }
 
-func (c *responderClient) SetMode(ctx context.Context, in *GetModeRequest, opts ...grpc.CallOption) (*GetModeResponse, error) {
-	out := new(GetModeResponse)
+func (c *responderClient) SetMode(ctx context.Context, in *SetModeRequest, opts ...grpc.CallOption) (*SetModeResponse, error) {
+	out := new(SetModeResponse)
 	err := c.cc.Invoke(ctx, "/pb.Responder/SetMode", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -120,7 +120,7 @@ type ResponderServer interface {
 	GetRequests(context.Context, *GetRequestsRequest) (*GetRequestsResponse, error)
 	Reset(context.Context, *ResetRequest) (*ResetResponse, error)
 	GetMode(context.Context, *GetModeRequest) (*GetModeResponse, error)
-	SetMode(context.Context, *GetModeRequest) (*GetModeResponse, error)
+	SetMode(context.Context, *SetModeRequest) (*SetModeResponse, error)
 	mustEmbedUnimplementedResponderServer()
 }
 
@@ -149,7 +149,7 @@ func (UnimplementedResponderServer) Reset(context.Context, *ResetRequest) (*Rese
 func (UnimplementedResponderServer) GetMode(context.Context, *GetModeRequest) (*GetModeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetMode not implemented")
 }
-func (UnimplementedResponderServer) SetMode(context.Context, *GetModeRequest) (*GetModeResponse, error) {
+func (UnimplementedResponderServer) SetMode(context.Context, *SetModeRequest) (*SetModeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetMode not implemented")
 }
 func (UnimplementedResponderServer) mustEmbedUnimplementedResponderServer() {}
@@ -292,7 +292,7 @@ func _Responder_GetMode_Handler(srv interface{}, ctx context.Context, dec func(i
 }
 
 func _Responder_SetMode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetModeRequest)
+	in := new(SetModeRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -304,7 +304,7 @@ func _Responder_SetMode_Handler(srv interface{}, ctx context.Context, dec func(i
 		FullMethod: "/pb.Responder/SetMode",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ResponderServer).SetMode(ctx, req.(*GetModeRequest))
+		return srv.(ResponderServer).SetMode(ctx, req.(*SetModeRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
