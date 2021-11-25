@@ -36,6 +36,9 @@ const (
 	pubTopic           = "neworder"
 	subTopic           = "neworder2"
 	route              = "/orders2"
+	portal             = "portal"
+	responder          = "responder"
+	storage            = "storage"
 )
 
 type Responder struct {
@@ -86,12 +89,12 @@ func (a *Responder) GetInfo(ctx context.Context, in *pb.GetInfoRequest) (*pb.Get
 		return nil, errors.New(emptyRequest)
 	}
 
-	if in.Service == "responder" {
+	if in.Service == responder {
 		a.responder.ServiceCountRequests++
 		return &pb.GetInfoResponse{Value: a.responder.ServiceDesc}, nil
 	}
 
-	if in.Service == "storage" {
+	if in.Service == storage {
 		id := getId(time.Now().String())
 		if err := a.PublishMsg(ctx, id, "getInfo", nil); err != nil {
 			return nil, err
@@ -113,12 +116,12 @@ func (a *Responder) SetInfo(ctx context.Context, in *pb.SetInfoRequest) (*pb.Set
 		return nil, errors.New(emptyRequest)
 	}
 
-	if in.Service == "responder" {
+	if in.Service == responder {
 		a.responder.ServiceDesc = in.Value
 		return &pb.SetInfoResponse{Msg: success}, nil
 	}
 
-	if in.Service == "storage" {
+	if in.Service == storage {
 		id := getId(time.Now().String())
 		if err := a.PublishMsg(ctx, id, "setInfo", in.Value); err != nil {
 			return nil, err
@@ -140,7 +143,7 @@ func (a *Responder) GetUptime(ctx context.Context, in *pb.GetUptimeRequest) (*pb
 		return nil, errors.New(emptyRequest)
 	}
 
-	if in.Service == "storage" || in.Service == "responder" || in.Service == "portal" {
+	if in.Service == storage || in.Service == responder || in.Service == portal {
 		id := getId(time.Now().String())
 		if err := a.PublishMsg(ctx, id, "getMode", in.Service); err != nil {
 			return nil, err
@@ -161,11 +164,11 @@ func (a *Responder) GetUptime(ctx context.Context, in *pb.GetUptimeRequest) (*pb
 			return &pb.GetUptimeResponse{Value: mode}, nil
 		}
 
-		if mode == "true" && in.Service == "responder" {
+		if mode == "true" && in.Service == responder {
 			return &pb.GetUptimeResponse{Value: time.Since(a.responder.ServiceUptime).String()}, nil
 		}
 
-		if mode == "true" && in.Service == "storage" {
+		if mode == "true" && in.Service == storage {
 			id := getId(time.Now().String())
 			if err := a.PublishMsg(ctx, id, "getUptime", nil); err != nil {
 				return nil, err
@@ -190,12 +193,12 @@ func (a *Responder) GetRequests(ctx context.Context, in *pb.GetRequestsRequest) 
 		return nil, errors.New(emptyRequest)
 	}
 
-	if in.Service == "responder" {
+	if in.Service == responder {
 		a.responder.ServiceCountRequests++
 		return &pb.GetRequestsResponse{Value: int32(int(a.responder.ServiceCountRequests))}, nil
 	}
 
-	if in.Service == "storage" {
+	if in.Service == storage {
 		id := getId(time.Now().String())
 		if err := a.PublishMsg(ctx, id, "getRequests", nil); err != nil {
 			return nil, err
@@ -221,12 +224,12 @@ func (a *Responder) Reset(ctx context.Context, in *pb.ResetRequest) (*pb.ResetRe
 		return nil, errors.New(emptyRequest)
 	}
 
-	if in.Service == "responder" {
+	if in.Service == responder {
 		a.responder = getResponder()
 		return &pb.ResetResponse{Msg: success}, nil
 	}
 
-	if in.Service == "storage" {
+	if in.Service == storage {
 		id := getId(time.Now().String())
 		if err := a.PublishMsg(ctx, id, "reset", nil); err != nil {
 			return nil, err
@@ -276,7 +279,7 @@ func (a *Responder) SetMode(ctx context.Context, in *pb.SetModeRequest) (*pb.Set
 		return nil, errors.New(emptyRequest)
 	}
 
-	if in.Service == "storage" || in.Service == "responder" || in.Service == "portal" {
+	if in.Service == storage || in.Service == responder || in.Service == portal {
 		id := getId(time.Now().String())
 		if err := a.PublishMsg(ctx, id, "setMode", in.Service+"&"+strconv.FormatBool(in.Mode)); err != nil {
 			return nil, err
