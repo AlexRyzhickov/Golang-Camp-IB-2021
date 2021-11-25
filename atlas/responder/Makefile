@@ -25,13 +25,7 @@ gen-proto: docker-build-generator
 
 .PHONY: run-responder
 run-responder:
-	@export DAPR_PUBSUB_NAME=messages && dapr run --app-id responder \
-           --app-protocol http \
-           --app-port 8088 \
-           --dapr-http-port 3501 \
-           --log-level debug \
-           --components-path ./config \
-           go run cmd/server/*.go
+	@export DAPR_PUBSUB_NAME=messages && export DAPR_GRPC_PORT=43011 && go run cmd/server/*.go
 
 .PHONY: run-dapr
 run-dapr:

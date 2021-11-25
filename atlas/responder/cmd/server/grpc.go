@@ -3,7 +3,6 @@ package main
 import (
 	"atlas/responder/pkg/pb"
 	"atlas/responder/pkg/svc"
-	"github.com/dapr/go-sdk/service/common"
 	dapr "github.com/dapr/go-sdk/service/http"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_logrus "github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus"
@@ -59,15 +58,9 @@ func NewGRPCServer(logger *logrus.Logger) (*grpc.Server, error) {
 	reflection.Register(grpcServer)
 
 	go func() {
-		sub := &common.Subscription{
-			PubsubName: "messages",
-			Topic:      "neworder2",
-			Route:      "/orders2",
-		}
-
 		s := dapr.NewService(":8088")
 
-		if err := s.AddTopicEventHandler(sub, srv.EventHandler); err != nil {
+		if err := s.AddTopicEventHandler(srv.Sub, srv.EventHandler); err != nil {
 			logger.Fatalf("error adding topic subscription: %v", err)
 		}
 

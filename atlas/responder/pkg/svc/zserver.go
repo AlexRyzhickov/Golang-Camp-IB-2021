@@ -25,16 +25,18 @@ import (
 	"time"
 )
 
-const invalidServiceName = "invalid service name"
-const emptyRequest = "empty Request"
-const success = "success"
-const errorMsg = "error"
-const errorMissingResp = "missing repository response error"
-const hiddenUptimeMsg = "uptime is hidden, mode = false"
-
 const (
 	// version is the current version of the service
-	version = "0.0.1"
+	version            = "0.0.1"
+	invalidServiceName = "invalid service name"
+	emptyRequest       = "empty Request"
+	success            = "success"
+	errorMsg           = "error"
+	errorMissingResp   = "missing repository response error"
+	hiddenUptimeMsg    = "uptime is hidden, mode = false"
+	pubTopic           = "neworder"
+	subTopic           = "neworder2"
+	route              = "/orders2"
 )
 
 type Responder struct {
@@ -43,6 +45,7 @@ type Responder struct {
 	logger    *logrus.Logger
 	responder models.Service
 	client    dapr.DaprClient
+	Sub       *common.Subscription
 }
 
 func getResponder() models.Service {
@@ -55,10 +58,13 @@ func getResponder() models.Service {
 }
 
 func NewResponder(logger *logrus.Logger, s *sync.Map) (*Responder, error) {
-	os.Setenv("DAPR_PUBSUB_NAME", "messages")
-	os.Setenv("DAPR_GRPC_PORT", "43011")
+	sub := &common.Subscription{
+		PubsubName: "messages",
+		Topic:      subTopic,
+		Route:      route,
+	}
 
-	conn, err := grpc.Dial(fmt.Sprintf("0.0.0.0:%s", "43011"), grpc.WithInsecure())
+	conn, err := grpc.Dial(fmt.Sprintf("0.0.0.0:%s", os.Getenv("DAPR_GRPC_PORT")), grpc.WithInsecure())
 	if err != nil {
 		return nil, fmt.Errorf("failed to open atlas pubsub connection: %v", err)
 	}
@@ -68,6 +74,7 @@ func NewResponder(logger *logrus.Logger, s *sync.Map) (*Responder, error) {
 		responses: s,
 		responder: getResponder(),
 		client:    dapr.NewDaprClient(conn),
+		Sub:       sub,
 	}, nil
 }
 
@@ -313,7 +320,7 @@ func (a *Responder) PublishMsg(ctx context.Context, id, command string, value in
 	}
 
 	_, err = a.client.PublishEvent(context.Background(), &dapr.PublishEventRequest{
-		Topic:      "neworder",
+		Topic:      pubTopic,
 		Data:       data,
 		PubsubName: "messages",
 	})
