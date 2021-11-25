@@ -2,45 +2,28 @@ package main
 
 import (
 	models "atlas/storage/internal/model"
+	"atlas/storage/pkg/svc"
 	"context"
-	"encoding/json"
 	"fmt"
-	"strconv"
 
-	//dapr "github.com/dapr/go-sdk/client"
-	dapr "github.com/dapr/dapr/pkg/proto/runtime/v1"
+	"log"
+	"net"
+	"net/http"
+	"strings"
+
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"log"
-	"net"
-	"net/http"
-	"os"
-	"strings"
-	"time"
-
-	"google.golang.org/protobuf/reflect/protoreflect"
 
 	"github.com/infobloxopen/atlas-app-toolkit/server"
 
 	"github.com/infobloxopen/atlas-app-toolkit/gorm/resource"
 
-	"github.com/dapr/go-sdk/service/common"
 	daprd "github.com/dapr/go-sdk/service/http"
-)
-
-const success = "success"
-
-var (
-	//pubsubName = os.Getenv("DAPR_PUBSUB_NAME")
-	//topicName  = "neworder2"
-	storage = getStorage()
 )
 
 func main() {
@@ -111,100 +94,17 @@ func ServeExternal(logger *logrus.Logger) error {
 		}
 	}
 
-	sub := &common.Subscription{
-		PubsubName: "messages",
-		Topic:      "neworder",
-		Route:      "/orders",
-	}
+	s := svc.NewStoragePubSub(db)
 
-	s := daprd.NewService(":8080")
+	service := daprd.NewService(":8080")
 
-	if err := s.AddTopicEventHandler(sub, eventHandler); err != nil {
+	if err := service.AddTopicEventHandler(s.Sub, s.EventHandler); err != nil {
 		logger.Fatalf("error adding topic subscription: %v", err)
 	}
 
-	if err := s.Start(); err != nil && err != http.ErrServerClosed {
+	if err := service.Start(); err != nil && err != http.ErrServerClosed {
 		logger.Fatalf("error listenning: %v", err)
 	}
-
-	return nil
-}
-
-func eventHandler(ctx context.Context, e *common.TopicEvent) (retry bool, err error) {
-	log.Printf("event - PubsubName: %s, Topic: %s, ID: %s, Data: %s", e.PubsubName, e.Topic, e.ID, e.Data)
-
-	var m map[string]string
-	json.Unmarshal([]byte(e.Data.(string)), &m)
-	log.Println(m["Id"])
-
-	id := m["Id"]
-	command := m["Command"]
-
-	var response interface{}
-
-	switch command {
-	case "getInfo":
-		storage.ServiceCountRequests++
-		response = storage.ServiceDesc
-	case "setInfo":
-		storage.ServiceCountRequests++
-		storage.ServiceDesc = m["Value"]
-		response = success
-	case "getRequests":
-		storage.ServiceCountRequests++
-		response = strconv.Itoa(int(storage.ServiceCountRequests))
-	case "reset":
-		storage = getStorage()
-		response = success
-	default:
-
-	}
-	log.Println(response)
-	if err := PublishMsg(ctx, id, response); err != nil {
-		return false, err
-	}
-
-	return false, nil
-}
-
-func PublishMsg(ctx context.Context, Id string, value interface{}) error {
-
-	response := models.StorageResponse{
-		Id:    Id,
-		Value: value,
-	}
-
-	data, err := json.Marshal(response)
-
-	if err != nil {
-		return status.Error(codes.Unknown, "err")
-	}
-
-	os.Setenv("DAPR_PUBSUB_NAME", "messages")
-	os.Setenv("DAPR_GRPC_PORT", "35787")
-
-	//client, err := dapr.NewClient()
-	//if err != nil {
-	//	return err
-	//}
-	//defer client.Close()
-
-	conn, err := grpc.Dial(fmt.Sprintf("0.0.0.0:%s", "35787"), grpc.WithInsecure())
-	if err != nil {
-		return err
-	}
-
-	client := dapr.NewDaprClient(conn)
-
-	//if err := client.PublishEvent(ctx, "messages", "neworder2", data); err != nil {
-	//	return err
-	//}
-
-	_, err = client.PublishEvent(context.Background(), &dapr.PublishEventRequest{
-		PubsubName: "messages",
-		Topic:      "neworder2",
-		Data:       data,
-	})
 
 	return nil
 }
@@ -240,13 +140,4 @@ func setDBConnection() {
 	//	viper.GetString("database.address"), viper.GetString("database.port"),
 	//	viper.GetString("database.user"), viper.GetString("database.password"),
 	//	viper.GetString("database.ssl"), viper.GetString("database.name")))
-}
-
-func getStorage() models.Service {
-	return models.Service{
-		ServiceName:          "storage",
-		ServiceDesc:          "storage service desc",
-		ServiceUptime:        time.Now(),
-		ServiceCountRequests: 0,
-	}
 }
