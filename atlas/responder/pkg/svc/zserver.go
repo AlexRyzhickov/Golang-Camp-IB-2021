@@ -198,7 +198,6 @@ func (a *Responder) Reset(ctx context.Context, in *pb.ResetRequest) (*pb.ResetRe
 			return nil, errors.New(errorMissingResp)
 		}
 		a.responses.Delete(id)
-		log.Println(result)
 		return &pb.ResetResponse{Msg: result.(map[string]string)["Value"]}, nil
 	}
 
@@ -206,6 +205,25 @@ func (a *Responder) Reset(ctx context.Context, in *pb.ResetRequest) (*pb.ResetRe
 }
 
 func (a *Responder) GetMode(ctx context.Context, in *pb.GetModeRequest) (*pb.GetModeResponse, error) {
+
+	if in.Service == "storage" || in.Service == "responder" || in.Service == "portal" {
+		id := getId(time.Now().String())
+		if err := a.PublishMsg(ctx, id, "getMode", in.Service); err != nil {
+			return nil, err
+		}
+		time.Sleep(time.Millisecond * 15)
+		result, ok := a.responses.Load(id)
+		if !ok {
+			return nil, errors.New(errorMissingResp)
+		}
+		a.responses.Delete(id)
+		mode, err := strconv.ParseBool(result.(map[string]string)["Value"])
+		if err != nil {
+			return nil, err
+		}
+		return &pb.GetModeResponse{Mode: mode}, nil
+	}
+
 	return nil, nil
 }
 

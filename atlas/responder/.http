@@ -48,5 +48,13 @@ POST http://localhost:8082/responder/v1/reset
 Content-Type: application/json
 
 {
+  "service": "responder"
+}
+
+###
+POST http://localhost:8082/responder/v1/getMode
+Content-Type: application/json
+
+{
   "service": "storage"
 }
