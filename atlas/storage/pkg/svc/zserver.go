@@ -38,20 +38,29 @@ type StoragePubSub struct {
 	Sub     *common.Subscription
 	db      *gorm.DB
 	storage models.Service
+	client  dapr.DaprClient
 }
 
-func NewStoragePubSub(db *gorm.DB) *StoragePubSub {
+func NewStoragePubSub(db *gorm.DB) (*StoragePubSub, error) {
 	sub := &common.Subscription{
 		PubsubName: "messages",
 		Topic:      subTopic,
 		Route:      route,
 	}
 
+	conn, err := grpc.Dial(fmt.Sprintf("0.0.0.0:%s", os.Getenv("DAPR_GRPC_PORT")), grpc.WithInsecure())
+	if err != nil {
+		return nil, fmt.Errorf("failed to open atlas pubsub connection: %v", err)
+	}
+
+	client := dapr.NewDaprClient(conn)
+
 	return &StoragePubSub{
 		Sub:     sub,
 		db:      db,
 		storage: getStorage(),
-	}
+		client:  client,
+	}, nil
 }
 
 func getStorage() models.Service {
@@ -121,20 +130,21 @@ func (s *StoragePubSub) EventHandler(ctx context.Context, e *common.TopicEvent) 
 		}
 		if note.Mode {
 			response = time.Since(s.storage.ServiceUptime).String()
+		} else {
+			response = hiddenUptimeMsg
 		}
-		response = hiddenUptimeMsg
 	default:
 		response = errorMsg
 	}
 
-	if err := PublishMsg(ctx, id, response); err != nil {
+	if err := s.PublishMsg(ctx, id, response); err != nil {
 		return false, err
 	}
 
 	return false, nil
 }
 
-func PublishMsg(ctx context.Context, Id string, value interface{}) error {
+func (s *StoragePubSub) PublishMsg(ctx context.Context, Id string, value interface{}) error {
 	response := models.StorageResponse{
 		Id:    Id,
 		Value: value,
@@ -146,14 +156,7 @@ func PublishMsg(ctx context.Context, Id string, value interface{}) error {
 		return status.Error(codes.Unknown, "err")
 	}
 
-	conn, err := grpc.Dial(fmt.Sprintf("0.0.0.0:%s", os.Getenv("DAPR_GRPC_PORT")), grpc.WithInsecure())
-	if err != nil {
-		return err
-	}
-
-	client := dapr.NewDaprClient(conn)
-
-	_, err = client.PublishEvent(context.Background(), &dapr.PublishEventRequest{
+	_, err = s.client.PublishEvent(context.Background(), &dapr.PublishEventRequest{
 		PubsubName: "messages",
 		Topic:      pubTopic,
 		Data:       data,

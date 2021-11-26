@@ -86,7 +86,10 @@ func ServeExternal(logger *logrus.Logger) error {
 		logger.Fatalln(err)
 	}
 
-	s := svc.NewStoragePubSub(db)
+	s, err := svc.NewStoragePubSub(db)
+	if err != nil {
+		logger.Fatalln(err)
+	}
 
 	service := daprd.NewService(":8080")
 
