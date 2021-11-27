@@ -92,25 +92,11 @@ func (r *Responder) GetInfo(ctx context.Context, in *pb.GetInfoRequest) (*pb.Get
 	}
 
 	if in.Service == storage {
-		id := uuid.NewString()
-		if err := r.PublishMsg(ctx, id, "getInfo", nil); err != nil {
+		result, err := r.handleRequest(ctx, "getInfo", nil)
+		if err != nil {
 			return nil, err
 		}
-
-		var result interface{}
-		signal := make(chan interface{}, 1)
-		r.responses.Store(id, signal)
-
-		for {
-			select {
-			case result = <-signal:
-				r.responses.Delete(id)
-				return &pb.GetInfoResponse{Value: result.(map[string]string)["Value"]}, nil
-			case <-time.After(5 * time.Second):
-				r.responses.Delete(id)
-				return nil, errors.New(errorMissingResp)
-			}
-		}
+		return &pb.GetInfoResponse{Value: result.(string)}, nil
 	}
 
 	return nil, errors.New(invalidServiceName)
@@ -130,25 +116,11 @@ func (r *Responder) SetInfo(ctx context.Context, in *pb.SetInfoRequest) (*pb.Set
 	}
 
 	if in.Service == storage {
-		id := uuid.NewString()
-		if err := r.PublishMsg(ctx, id, "setInfo", in.Value); err != nil {
+		result, err := r.handleRequest(ctx, "setInfo", in.Value)
+		if err != nil {
 			return nil, err
 		}
-
-		var result interface{}
-		signal := make(chan interface{}, 1)
-		r.responses.Store(id, signal)
-
-		for {
-			select {
-			case result = <-signal:
-				r.responses.Delete(id)
-				return &pb.SetInfoResponse{Msg: result.(map[string]string)["Value"]}, nil
-			case <-time.After(5 * time.Second):
-				r.responses.Delete(id)
-				return nil, errors.New(errorMissingResp)
-			}
-		}
+		return &pb.SetInfoResponse{Msg: result.(string)}, nil
 	}
 
 	return nil, errors.New(invalidServiceName)
@@ -166,28 +138,11 @@ func (r *Responder) GetUptime(ctx context.Context, in *pb.GetUptimeRequest) (*pb
 	}
 
 	if in.Service == storage || in.Service == responder || in.Service == portal {
-		id := uuid.NewString()
-		if err := r.PublishMsg(ctx, id, "getMode", in.Service); err != nil {
+		result, err := r.handleRequest(ctx, "getMode", in.Service)
+		if err != nil {
 			return nil, err
 		}
-
-		var result interface{}
-		var mode string
-		var is = true
-		signal := make(chan interface{}, 1)
-		r.responses.Store(id, signal)
-
-		for is {
-			select {
-			case result = <-signal:
-				r.responses.Delete(id)
-				mode = result.(map[string]string)["Value"]
-				is = false
-			case <-time.After(5 * time.Second):
-				r.responses.Delete(id)
-				return nil, errors.New(errorMissingResp)
-			}
-		}
+		mode := result.(string)
 
 		if mode == "false" {
 			return &pb.GetUptimeResponse{Value: hiddenUptimeMsg}, nil
@@ -202,22 +157,11 @@ func (r *Responder) GetUptime(ctx context.Context, in *pb.GetUptimeRequest) (*pb
 		}
 
 		if mode == "true" && in.Service == storage {
-			id := uuid.NewString()
-			if err := r.PublishMsg(ctx, id, "getUptime", nil); err != nil {
+			result, err := r.handleRequest(ctx, "getUptime", in.Service)
+			if err != nil {
 				return nil, err
 			}
-			signal := make(chan interface{}, 1)
-			r.responses.Store(id, signal)
-			for {
-				select {
-				case result = <-signal:
-					r.responses.Delete(id)
-					return &pb.GetUptimeResponse{Value: result.(map[string]string)["Value"]}, nil
-				case <-time.After(5 * time.Second):
-					r.responses.Delete(id)
-					return nil, errors.New(errorMissingResp)
-				}
-			}
+			return &pb.GetUptimeResponse{Value: result.(string)}, nil
 		}
 
 		return nil, errors.New("invalid value from storage")
@@ -239,30 +183,15 @@ func (r *Responder) GetRequests(ctx context.Context, in *pb.GetRequestsRequest) 
 	}
 
 	if in.Service == storage {
-		id := uuid.NewString()
-		if err := r.PublishMsg(ctx, id, "getRequests", nil); err != nil {
+		result, err := r.handleRequest(ctx, "getRequests", nil)
+		if err != nil {
 			return nil, err
 		}
-
-		var result interface{}
-		signal := make(chan interface{}, 1)
-		r.responses.Store(id, signal)
-
-		for {
-			select {
-			case result = <-signal:
-				r.responses.Delete(id)
-				i, err := strconv.Atoi(result.(map[string]string)["Value"])
-				if err != nil {
-					return nil, err
-				}
-				return &pb.GetRequestsResponse{Value: int32(i)}, nil
-			case <-time.After(5 * time.Second):
-				r.responses.Delete(id)
-				return nil, errors.New(errorMissingResp)
-			}
+		i, err := strconv.Atoi(result.(string))
+		if err != nil {
+			return nil, err
 		}
-
+		return &pb.GetRequestsResponse{Value: int32(i)}, nil
 	}
 
 	return nil, errors.New(invalidServiceName)
@@ -284,25 +213,11 @@ func (r *Responder) Reset(ctx context.Context, in *pb.ResetRequest) (*pb.ResetRe
 	}
 
 	if in.Service == storage {
-		id := uuid.NewString()
-		if err := r.PublishMsg(ctx, id, "reset", nil); err != nil {
+		result, err := r.handleRequest(ctx, "reset", nil)
+		if err != nil {
 			return nil, err
 		}
-
-		var result interface{}
-		signal := make(chan interface{}, 1)
-		r.responses.Store(id, signal)
-
-		for {
-			select {
-			case result = <-signal:
-				r.responses.Delete(id)
-				return &pb.ResetResponse{Msg: result.(map[string]string)["Value"]}, nil
-			case <-time.After(5 * time.Second):
-				r.responses.Delete(id)
-				return nil, errors.New(errorMissingResp)
-			}
-		}
+		return &pb.ResetResponse{Msg: result.(string)}, nil
 	}
 
 	return nil, errors.New(invalidServiceName)
@@ -319,30 +234,16 @@ func (r *Responder) GetMode(ctx context.Context, in *pb.GetModeRequest) (*pb.Get
 		r.responder.Unlock()
 	}
 
-	if in.Service == "storage" || in.Service == "responder" || in.Service == "portal" {
-		id := uuid.NewString()
-		if err := r.PublishMsg(ctx, id, "getMode", in.Service); err != nil {
+	if in.Service == storage || in.Service == responder || in.Service == portal {
+		result, err := r.handleRequest(ctx, "getMode", in.Service)
+		if err != nil {
 			return nil, err
 		}
-
-		var result interface{}
-		signal := make(chan interface{}, 1)
-		r.responses.Store(id, signal)
-
-		for {
-			select {
-			case result = <-signal:
-				r.responses.Delete(id)
-				mode := result.(map[string]string)["Value"]
-				if mode == "true" || mode == "false" {
-					return &pb.GetModeResponse{Mode: mode}, nil
-				}
-				return nil, errors.New("invalid value from storage")
-			case <-time.After(5 * time.Second):
-				r.responses.Delete(id)
-				return nil, errors.New(errorMissingResp)
-			}
+		mode := result.(string)
+		if mode == "true" || mode == "false" {
+			return &pb.GetModeResponse{Mode: mode}, nil
 		}
+		return nil, errors.New("invalid value from storage")
 	}
 
 	return nil, errors.New(invalidServiceName)
@@ -360,25 +261,11 @@ func (r *Responder) SetMode(ctx context.Context, in *pb.SetModeRequest) (*pb.Set
 	}
 
 	if in.Service == storage || in.Service == responder || in.Service == portal {
-		id := uuid.NewString()
-		if err := r.PublishMsg(ctx, id, "setMode", in.Service+"&"+strconv.FormatBool(in.Mode)); err != nil {
+		result, err := r.handleRequest(ctx, "setMode", in.Service+"&"+strconv.FormatBool(in.Mode))
+		if err != nil {
 			return nil, err
 		}
-
-		var result interface{}
-		signal := make(chan interface{}, 1)
-		r.responses.Store(id, signal)
-
-		for {
-			select {
-			case result = <-signal:
-				r.responses.Delete(id)
-				return &pb.SetModeResponse{Msg: result.(map[string]string)["Value"]}, nil
-			case <-time.After(5 * time.Second):
-				r.responses.Delete(id)
-				return nil, errors.New(errorMissingResp)
-			}
-		}
+		return &pb.SetModeResponse{Msg: result.(string)}, nil
 	}
 
 	return nil, errors.New(invalidServiceName)
@@ -423,4 +310,26 @@ func (r *Responder) PublishMsg(ctx context.Context, id, command string, value in
 	})
 
 	return err
+}
+
+func (r *Responder) handleRequest(ctx context.Context, cmd string, value interface{}) (interface{}, error) {
+	id := uuid.NewString()
+	if err := r.PublishMsg(ctx, id, cmd, value); err != nil {
+		return nil, err
+	}
+
+	var result interface{}
+	signal := make(chan interface{}, 1)
+	r.responses.Store(id, signal)
+
+	for {
+		select {
+		case result = <-signal:
+			r.responses.Delete(id)
+			return result.(map[string]string)["Value"], nil
+		case <-time.After(5 * time.Second):
+			r.responses.Delete(id)
+			return nil, errors.New(errorMissingResp)
+		}
+	}
 }
