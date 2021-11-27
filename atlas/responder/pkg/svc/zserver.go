@@ -49,7 +49,7 @@ type Responder struct {
 func getResponder() models.Service {
 	return models.Service{
 		ServiceDesc:          "responder service desc",
-		ServiceUptime:        time.Now(),
+		ServiceUptime:        time.Now().UTC(),
 		ServiceCountRequests: 0,
 	}
 }

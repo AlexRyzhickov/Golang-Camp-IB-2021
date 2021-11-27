@@ -68,7 +68,7 @@ func NewStoragePubSub(db *gorm.DB, logger *logrus.Logger) (*StoragePubSub, error
 func getStorage() models.Service {
 	return models.Service{
 		ServiceDesc:          "storage service desc",
-		ServiceUptime:        time.Now(),
+		ServiceUptime:        time.Now().UTC(),
 		ServiceCountRequests: 0,
 	}
 }

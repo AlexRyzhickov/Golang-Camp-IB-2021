@@ -36,7 +36,7 @@ type Portal struct {
 func getPortal() models.Service {
 	return models.Service{
 		ServiceDesc:          "portal service desc",
-		ServiceUptime:        time.Now(),
+		ServiceUptime:        time.Now().UTC(),
 		ServiceCountRequests: 0,
 	}
 }
