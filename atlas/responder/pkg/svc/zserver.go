@@ -96,13 +96,21 @@ func (a *Responder) GetInfo(ctx context.Context, in *pb.GetInfoRequest) (*pb.Get
 		if err := a.PublishMsg(ctx, id, "getInfo", nil); err != nil {
 			return nil, err
 		}
-		time.Sleep(time.Millisecond * 15)
-		result, ok := a.responses.Load(id)
-		if !ok {
-			return &pb.GetInfoResponse{Value: errorMissingResp}, nil
+
+		var result interface{}
+		signal := make(chan interface{}, 1)
+		a.responses.Store(id, signal)
+
+		for {
+			select {
+			case result = <-signal:
+				a.responses.Delete(id)
+				return &pb.GetInfoResponse{Value: result.(map[string]string)["Value"]}, nil
+			case <-time.After(5 * time.Second):
+				a.responses.Delete(id)
+				return nil, errors.New(errorMissingResp)
+			}
 		}
-		a.responses.Delete(id)
-		return &pb.GetInfoResponse{Value: result.(map[string]string)["Value"]}, nil
 	}
 
 	return nil, errors.New(invalidServiceName)
@@ -123,13 +131,21 @@ func (a *Responder) SetInfo(ctx context.Context, in *pb.SetInfoRequest) (*pb.Set
 		if err := a.PublishMsg(ctx, id, "setInfo", in.Value); err != nil {
 			return nil, err
 		}
-		time.Sleep(time.Millisecond * 15)
-		result, ok := a.responses.Load(id)
-		if !ok {
-			return &pb.SetInfoResponse{Msg: errorMissingResp}, nil
+
+		var result interface{}
+		signal := make(chan interface{}, 1)
+		a.responses.Store(id, signal)
+
+		for {
+			select {
+			case result = <-signal:
+				a.responses.Delete(id)
+				return &pb.SetInfoResponse{Msg: result.(map[string]string)["Value"]}, nil
+			case <-time.After(5 * time.Second):
+				a.responses.Delete(id)
+				return nil, errors.New(errorMissingResp)
+			}
 		}
-		a.responses.Delete(id)
-		return &pb.SetInfoResponse{Msg: result.(map[string]string)["Value"]}, nil
 	}
 
 	return nil, errors.New(invalidServiceName)
@@ -145,13 +161,31 @@ func (a *Responder) GetUptime(ctx context.Context, in *pb.GetUptimeRequest) (*pb
 		if err := a.PublishMsg(ctx, id, "getMode", in.Service); err != nil {
 			return nil, err
 		}
-		time.Sleep(time.Millisecond * 15)
-		result, ok := a.responses.Load(id)
-		if !ok {
-			return nil, errors.New(errorMissingResp)
+		//time.Sleep(time.Millisecond * 15)
+		//result, ok := a.responses.Load(id)
+		//if !ok {
+		//	return nil, errors.New(errorMissingResp)
+		//}
+		//a.responses.Delete(id)
+		//mode := result.(map[string]string)["Value"]
+
+		var result interface{}
+		var mode string
+		var is = true
+		signal := make(chan interface{}, 1)
+		a.responses.Store(id, signal)
+
+		for is {
+			select {
+			case result = <-signal:
+				a.responses.Delete(id)
+				mode = result.(map[string]string)["Value"]
+				is = false
+			case <-time.After(5 * time.Second):
+				a.responses.Delete(id)
+				return nil, errors.New(errorMissingResp)
+			}
 		}
-		a.responses.Delete(id)
-		mode := result.(map[string]string)["Value"]
 
 		if mode == "false" {
 			return &pb.GetUptimeResponse{Value: hiddenUptimeMsg}, nil
@@ -170,13 +204,16 @@ func (a *Responder) GetUptime(ctx context.Context, in *pb.GetUptimeRequest) (*pb
 			if err := a.PublishMsg(ctx, id, "getUptime", nil); err != nil {
 				return nil, err
 			}
-			time.Sleep(time.Millisecond * 15)
-			result, ok := a.responses.Load(id)
-			if !ok {
-				return nil, errors.New(errorMissingResp)
+			for {
+				select {
+				case result = <-signal:
+					a.responses.Delete(id)
+					return &pb.GetUptimeResponse{Value: result.(map[string]string)["Value"]}, nil
+				case <-time.After(5 * time.Second):
+					a.responses.Delete(id)
+					return nil, errors.New(errorMissingResp)
+				}
 			}
-			a.responses.Delete(id)
-			return &pb.GetUptimeResponse{Value: result.(map[string]string)["Value"]}, nil
 		}
 
 		return nil, errors.New("invalid value from storage")
@@ -200,17 +237,26 @@ func (a *Responder) GetRequests(ctx context.Context, in *pb.GetRequestsRequest) 
 		if err := a.PublishMsg(ctx, id, "getRequests", nil); err != nil {
 			return nil, err
 		}
-		time.Sleep(time.Millisecond * 15)
-		result, ok := a.responses.Load(id)
-		if !ok {
-			return nil, errors.New(errorMissingResp)
+
+		var result interface{}
+		signal := make(chan interface{}, 1)
+		a.responses.Store(id, signal)
+
+		for {
+			select {
+			case result = <-signal:
+				a.responses.Delete(id)
+				i, err := strconv.Atoi(result.(map[string]string)["Value"])
+				if err != nil {
+					return nil, err
+				}
+				return &pb.GetRequestsResponse{Value: int32(i)}, nil
+			case <-time.After(5 * time.Second):
+				a.responses.Delete(id)
+				return nil, errors.New(errorMissingResp)
+			}
 		}
-		a.responses.Delete(id)
-		i, err := strconv.Atoi(result.(map[string]string)["Value"])
-		if err != nil {
-			return nil, err
-		}
-		return &pb.GetRequestsResponse{Value: int32(i)}, nil
+
 	}
 
 	return nil, errors.New(invalidServiceName)
@@ -231,13 +277,21 @@ func (a *Responder) Reset(ctx context.Context, in *pb.ResetRequest) (*pb.ResetRe
 		if err := a.PublishMsg(ctx, id, "reset", nil); err != nil {
 			return nil, err
 		}
-		time.Sleep(time.Millisecond * 15)
-		result, ok := a.responses.Load(id)
-		if !ok {
-			return nil, errors.New(errorMissingResp)
+
+		var result interface{}
+		signal := make(chan interface{}, 1)
+		a.responses.Store(id, signal)
+
+		for {
+			select {
+			case result = <-signal:
+				a.responses.Delete(id)
+				return &pb.ResetResponse{Msg: result.(map[string]string)["Value"]}, nil
+			case <-time.After(5 * time.Second):
+				a.responses.Delete(id)
+				return nil, errors.New(errorMissingResp)
+			}
 		}
-		a.responses.Delete(id)
-		return &pb.ResetResponse{Msg: result.(map[string]string)["Value"]}, nil
 	}
 
 	return nil, errors.New(invalidServiceName)
@@ -253,19 +307,25 @@ func (a *Responder) GetMode(ctx context.Context, in *pb.GetModeRequest) (*pb.Get
 		if err := a.PublishMsg(ctx, id, "getMode", in.Service); err != nil {
 			return nil, err
 		}
-		time.Sleep(time.Millisecond * 15)
-		result, ok := a.responses.Load(id)
-		if !ok {
-			return nil, errors.New(errorMissingResp)
-		}
-		a.responses.Delete(id)
-		mode := result.(map[string]string)["Value"]
 
-		if mode == "true" || mode == "false" {
-			return &pb.GetModeResponse{Mode: mode}, nil
-		}
+		var result interface{}
+		signal := make(chan interface{}, 1)
+		a.responses.Store(id, signal)
 
-		return nil, errors.New("invalid value from storage")
+		for {
+			select {
+			case result = <-signal:
+				a.responses.Delete(id)
+				mode := result.(map[string]string)["Value"]
+				if mode == "true" || mode == "false" {
+					return &pb.GetModeResponse{Mode: mode}, nil
+				}
+				return nil, errors.New("invalid value from storage")
+			case <-time.After(5 * time.Second):
+				a.responses.Delete(id)
+				return nil, errors.New(errorMissingResp)
+			}
+		}
 	}
 
 	return nil, errors.New(invalidServiceName)
@@ -281,13 +341,21 @@ func (a *Responder) SetMode(ctx context.Context, in *pb.SetModeRequest) (*pb.Set
 		if err := a.PublishMsg(ctx, id, "setMode", in.Service+"&"+strconv.FormatBool(in.Mode)); err != nil {
 			return nil, err
 		}
-		time.Sleep(time.Millisecond * 15)
-		result, ok := a.responses.Load(id)
-		if !ok {
-			return nil, errors.New(errorMissingResp)
+
+		var result interface{}
+		signal := make(chan interface{}, 1)
+		a.responses.Store(id, signal)
+
+		for {
+			select {
+			case result = <-signal:
+				a.responses.Delete(id)
+				return &pb.SetModeResponse{Msg: result.(map[string]string)["Value"]}, nil
+			case <-time.After(5 * time.Second):
+				a.responses.Delete(id)
+				return nil, errors.New(errorMissingResp)
+			}
 		}
-		a.responses.Delete(id)
-		return &pb.SetModeResponse{Msg: result.(map[string]string)["Value"]}, nil
 	}
 
 	return nil, errors.New(invalidServiceName)
@@ -303,7 +371,12 @@ func (a *Responder) EventHandler(ctx context.Context, e *common.TopicEvent) (ret
 		return false, err
 	}
 
-	a.responses.Store(m["Id"], m)
+	signal, ok := a.responses.Load(m["Id"])
+	if ok {
+		signal.(chan interface{}) <- m
+	}
+
+	//a.responses.Store(m["Id"], m)
 
 	return false, nil
 }
