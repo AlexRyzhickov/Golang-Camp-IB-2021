@@ -148,7 +148,7 @@ func (r *Responder) GetUptime(ctx context.Context, in *pb.GetUptimeRequest) (*pb
 			return &pb.GetUptimeResponse{Value: hiddenUptimeMsg}, nil
 		}
 
-		if mode == "true" && in.Service == "portal" {
+		if mode == "true" && in.Service == portal {
 			return &pb.GetUptimeResponse{Value: mode}, nil
 		}
 
@@ -157,7 +157,7 @@ func (r *Responder) GetUptime(ctx context.Context, in *pb.GetUptimeRequest) (*pb
 		}
 
 		if mode == "true" && in.Service == storage {
-			result, err := r.handleRequest(ctx, "getUptime", in.Service)
+			result, err := r.handleRequest(ctx, "getUptime", nil)
 			if err != nil {
 				return nil, err
 			}
