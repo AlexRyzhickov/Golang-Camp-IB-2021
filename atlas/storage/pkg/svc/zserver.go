@@ -121,9 +121,8 @@ func (s *StoragePubSub) EventHandler(ctx context.Context, e *common.TopicEvent) 
 		}
 		response = success
 	case getUptime:
-		serviceName := m["Value"]
 		note := models.Note{
-			Service: serviceName,
+			Service: "storage",
 		}
 		if err := s.db.First(&note).Error; err != nil {
 			return false, err
