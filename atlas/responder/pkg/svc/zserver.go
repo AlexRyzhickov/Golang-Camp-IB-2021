@@ -204,6 +204,8 @@ func (a *Responder) GetUptime(ctx context.Context, in *pb.GetUptimeRequest) (*pb
 			if err := a.PublishMsg(ctx, id, "getUptime", nil); err != nil {
 				return nil, err
 			}
+			signal := make(chan interface{}, 1)
+			a.responses.Store(id, signal)
 			for {
 				select {
 				case result = <-signal:
