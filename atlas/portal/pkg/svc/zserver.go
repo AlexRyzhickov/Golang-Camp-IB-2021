@@ -35,7 +35,6 @@ type Portal struct {
 
 func getPortal() models.Service {
 	return models.Service{
-		ServiceName:          "portal",
 		ServiceDesc:          "portal service desc",
 		ServiceUptime:        time.Now(),
 		ServiceCountRequests: 0,
@@ -67,7 +66,9 @@ func (p *Portal) GetInfo(ctx context.Context, in *pb.GetInfoRequest) (*pb.GetInf
 	}
 
 	if in.Service == portal {
+		p.portal.Lock()
 		p.portal.ServiceCountRequests++
+		p.portal.Unlock()
 		return &pb.GetInfoResponse{Value: p.portal.ServiceDesc}, nil
 	}
 
@@ -88,8 +89,10 @@ func (p *Portal) SetInfo(ctx context.Context, in *pb.SetInfoRequest) (*pb.SetInf
 	}
 
 	if in.Service == portal {
+		p.portal.Lock()
 		p.portal.ServiceCountRequests++
 		p.portal.ServiceDesc = in.Value
+		p.portal.Unlock()
 		return &pb.SetInfoResponse{Msg: success}, nil
 	}
 
@@ -110,7 +113,9 @@ func (p *Portal) GetUptime(ctx context.Context, in *pb.GetUptimeRequest) (*pb.Ge
 	}
 
 	if in.Service == portal {
+		p.portal.Lock()
 		p.portal.ServiceCountRequests++
+		p.portal.Unlock()
 	}
 
 	if in.Service == portal || in.Service == responder || in.Service == storage {
@@ -141,7 +146,9 @@ func (p *Portal) GetRequests(ctx context.Context, in *pb.GetRequestsRequest) (*p
 	}
 
 	if in.Service == portal {
+		p.portal.Lock()
 		p.portal.ServiceCountRequests++
+		p.portal.Unlock()
 		return &pb.GetRequestsResponse{Value: int32(int(p.portal.ServiceCountRequests))}, nil
 	}
 
@@ -162,8 +169,12 @@ func (p *Portal) Reset(ctx context.Context, in *pb.ResetRequest) (*pb.ResetRespo
 	}
 
 	if in.Service == portal {
-		p.portal.ServiceCountRequests++
-		p.portal = getPortal()
+		p.portal.Lock()
+		newPortal := getPortal()
+		p.portal.ServiceCountRequests = newPortal.ServiceCountRequests
+		p.portal.ServiceDesc = newPortal.ServiceDesc
+		p.portal.ServiceUptime = newPortal.ServiceUptime
+		p.portal.Unlock()
 		return &pb.ResetResponse{Msg: success}, nil
 	}
 
@@ -184,7 +195,9 @@ func (p *Portal) GetMode(ctx context.Context, in *pb.GetModeRequest) (*pb.GetMod
 	}
 
 	if in.Service == portal {
+		p.portal.Lock()
 		p.portal.ServiceCountRequests++
+		p.portal.Unlock()
 	}
 
 	if in.Service == portal || in.Service == responder || in.Service == storage {
@@ -204,7 +217,9 @@ func (p *Portal) SetMode(ctx context.Context, in *pb.SetModeRequest) (*pb.SetMod
 	}
 
 	if in.Service == portal {
+		p.portal.Lock()
 		p.portal.ServiceCountRequests++
+		p.portal.Unlock()
 	}
 
 	if in.Service == portal || in.Service == responder || in.Service == storage {
