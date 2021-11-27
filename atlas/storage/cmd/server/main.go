@@ -86,7 +86,7 @@ func ServeExternal(logger *logrus.Logger) error {
 		logger.Fatalln(err)
 	}
 
-	s, err := svc.NewStoragePubSub(db)
+	s, err := svc.NewStoragePubSub(db, logger)
 	if err != nil {
 		logger.Fatalln(err)
 	}

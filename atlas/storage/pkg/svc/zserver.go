@@ -7,11 +7,11 @@ import (
 	"fmt"
 	dapr "github.com/dapr/dapr/pkg/proto/runtime/v1"
 	"github.com/dapr/go-sdk/service/common"
+	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
-	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -39,9 +39,10 @@ type StoragePubSub struct {
 	db      *gorm.DB
 	storage models.Service
 	client  dapr.DaprClient
+	logger  *logrus.Logger
 }
 
-func NewStoragePubSub(db *gorm.DB) (*StoragePubSub, error) {
+func NewStoragePubSub(db *gorm.DB, logger *logrus.Logger) (*StoragePubSub, error) {
 	sub := &common.Subscription{
 		PubsubName: "messages",
 		Topic:      subTopic,
@@ -60,6 +61,7 @@ func NewStoragePubSub(db *gorm.DB) (*StoragePubSub, error) {
 		db:      db,
 		storage: getStorage(),
 		client:  client,
+		logger:  logger,
 	}, nil
 }
 
@@ -73,12 +75,11 @@ func getStorage() models.Service {
 }
 
 func (s *StoragePubSub) EventHandler(ctx context.Context, e *common.TopicEvent) (retry bool, err error) {
-	log.Printf("event - PubsubName: %s, Topic: %s, ID: %s, Data: %s", e.PubsubName, e.Topic, e.ID, e.Data)
+	s.logger.Debugf("event - PubsubName: %s, Topic: %s, ID: %s, Data: %s", e.PubsubName, e.Topic, e.ID, e.Data)
 	s.storage.ServiceCountRequests++
 
 	var m map[string]string
 	json.Unmarshal([]byte(e.Data.(string)), &m)
-	log.Println(m["Id"])
 
 	id := m["Id"]
 	command := m["Command"]
