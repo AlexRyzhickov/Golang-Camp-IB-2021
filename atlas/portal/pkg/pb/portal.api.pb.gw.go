@@ -323,7 +323,7 @@ func RegisterPortalHandlerServer(ctx context.Context, mux *runtime.ServeMux, ser
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/portal.pb.Portal/GetInfo", runtime.WithHTTPPathPattern("/getInfo"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/portal.pb.Portal/GetInfo", runtime.WithHTTPPathPattern("/info"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -369,7 +369,7 @@ func RegisterPortalHandlerServer(ctx context.Context, mux *runtime.ServeMux, ser
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/portal.pb.Portal/GetUptime", runtime.WithHTTPPathPattern("/getUptime"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/portal.pb.Portal/GetUptime", runtime.WithHTTPPathPattern("/uptime"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -392,7 +392,7 @@ func RegisterPortalHandlerServer(ctx context.Context, mux *runtime.ServeMux, ser
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/portal.pb.Portal/GetRequests", runtime.WithHTTPPathPattern("/getRequests"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/portal.pb.Portal/GetRequests", runtime.WithHTTPPathPattern("/requests"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -438,7 +438,7 @@ func RegisterPortalHandlerServer(ctx context.Context, mux *runtime.ServeMux, ser
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/portal.pb.Portal/GetMode", runtime.WithHTTPPathPattern("/getMode"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/portal.pb.Portal/GetMode", runtime.WithHTTPPathPattern("/mode"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -543,7 +543,7 @@ func RegisterPortalHandlerClient(ctx context.Context, mux *runtime.ServeMux, cli
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/portal.pb.Portal/GetInfo", runtime.WithHTTPPathPattern("/getInfo"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/portal.pb.Portal/GetInfo", runtime.WithHTTPPathPattern("/info"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -583,7 +583,7 @@ func RegisterPortalHandlerClient(ctx context.Context, mux *runtime.ServeMux, cli
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/portal.pb.Portal/GetUptime", runtime.WithHTTPPathPattern("/getUptime"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/portal.pb.Portal/GetUptime", runtime.WithHTTPPathPattern("/uptime"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -603,7 +603,7 @@ func RegisterPortalHandlerClient(ctx context.Context, mux *runtime.ServeMux, cli
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/portal.pb.Portal/GetRequests", runtime.WithHTTPPathPattern("/getRequests"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/portal.pb.Portal/GetRequests", runtime.WithHTTPPathPattern("/requests"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -643,7 +643,7 @@ func RegisterPortalHandlerClient(ctx context.Context, mux *runtime.ServeMux, cli
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/portal.pb.Portal/GetMode", runtime.WithHTTPPathPattern("/getMode"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/portal.pb.Portal/GetMode", runtime.WithHTTPPathPattern("/mode"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -685,17 +685,17 @@ func RegisterPortalHandlerClient(ctx context.Context, mux *runtime.ServeMux, cli
 var (
 	pattern_Portal_GetVersion_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"version"}, ""))
 
-	pattern_Portal_GetInfo_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"getInfo"}, ""))
+	pattern_Portal_GetInfo_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"info"}, ""))
 
 	pattern_Portal_SetInfo_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"setInfo"}, ""))
 
-	pattern_Portal_GetUptime_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"getUptime"}, ""))
+	pattern_Portal_GetUptime_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"uptime"}, ""))
 
-	pattern_Portal_GetRequests_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"getRequests"}, ""))
+	pattern_Portal_GetRequests_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"requests"}, ""))
 
 	pattern_Portal_Reset_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"reset"}, ""))
 
-	pattern_Portal_GetMode_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"getMode"}, ""))
+	pattern_Portal_GetMode_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"mode"}, ""))
 
 	pattern_Portal_SetMode_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"setMode"}, ""))
 )

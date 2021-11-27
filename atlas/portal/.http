@@ -2,7 +2,7 @@
 GET http://localhost:8060/portal/v1/version
 
 ###
-POST http://localhost:8060/portal/v1/getInfo
+POST http://localhost:8060/portal/v1/info
 Content-Type: application/json
 
 {
@@ -19,7 +19,7 @@ Content-Type: application/json
 }
 
 ###
-POST http://localhost:8060/portal/v1/getInfo
+POST http://localhost:8060/portal/v1/info
 Content-Type: application/json
 
 {
@@ -36,7 +36,7 @@ Content-Type: application/json
 }
 
 ###
-POST http://localhost:8060/portal/v1/getRequests
+POST http://localhost:8060/portal/v1/requests
 Content-Type: application/json
 
 {
@@ -52,7 +52,7 @@ Content-Type: application/json
 }
 
 ###
-POST http://localhost:8060/portal/v1/getMode
+POST http://localhost:8060/portal/v1/mode
 Content-Type: application/json
 
 {
@@ -69,7 +69,7 @@ Content-Type: application/json
 }
 
 ###
-POST http://localhost:8060/portal/v1/getUptime
+POST http://localhost:8060/portal/v1/uptime
 Content-Type: application/json
 
 {

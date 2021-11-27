@@ -14,7 +14,7 @@ service Portal{
 
   rpc GetInfo  (GetInfoRequest) returns (GetInfoResponse) {
     option (google.api.http) = {
-      post: "/getInfo"
+      post: "/info"
       body: "*"
     };
   }
@@ -28,14 +28,14 @@ service Portal{
 
   rpc GetUptime (GetUptimeRequest) returns (GetUptimeResponse) {
     option (google.api.http) = {
-      post: "/getUptime"
+      post: "/uptime"
       body: "*"
     };
   }
 
   rpc GetRequests (GetRequestsRequest) returns (GetRequestsResponse) {
     option (google.api.http) = {
-      post: "/getRequests"
+      post: "/requests"
       body: "*"
     };
   }
@@ -49,7 +49,7 @@ service Portal{
 
   rpc GetMode (GetModeRequest) returns (GetModeResponse) {
     option (google.api.http) = {
-      post: "/getMode"
+      post: "/mode"
       body: "*"
     };
   }
