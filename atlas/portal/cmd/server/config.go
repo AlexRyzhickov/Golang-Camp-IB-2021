@@ -12,7 +12,7 @@ const (
 	// Gateway
 	defaultGatewayEnable      = true
 	defaultGatewayAddress     = "0.0.0.0"
-	defaultGatewayPort        = "8060"
+	defaultGatewayPort        = "8080"
 	defaultGatewayURL         = "/portal/v1/"
 	defaultGatewaySwaggerFile = "pkg/pb/service.swagger.json"
 
@@ -55,7 +55,7 @@ const (
 	// Health
 	defaultInternalEnable    = true
 	defaultInternalAddress   = "0.0.0.0"
-	defaultInternalPort      = "8076" //must confirurate
+	defaultInternalPort      = "8081"
 	defaultInternalHealth    = "/healthz"
 	defaultInternalReadiness = "/ready"
 
@@ -70,6 +70,10 @@ const (
 
 	// Logging
 	defaultLoggingLevel = "debug"
+
+	// External
+	defaultGrpcClientAddress = "0.0.0.0"
+	defaultGrpcClientPort    = "8080"
 )
 
 var (
@@ -128,4 +132,7 @@ var (
 	flagKeepaliveTimeout = pflag.Int("config.keepalive.timeout", defaultKeepaliveTimeout, "default value, in seconds, of the keepalive timeout")
 
 	flagLoggingLevel = pflag.String("logging.level", defaultLoggingLevel, "log level of application")
+
+	flagGrpcClientAddress = pflag.String("client.address", defaultGrpcClientAddress, "address of grpc client")
+	flagGrpcClientPort    = pflag.String("client.port", defaultGrpcClientPort, "port of grpc client")
 )

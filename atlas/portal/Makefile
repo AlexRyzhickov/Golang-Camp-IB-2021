@@ -22,3 +22,7 @@ gen-proto: docker-build-generator
 		--grpc-gateway_out=. --grpc-gateway_opt=logtostderr=true --grpc-gateway_opt=paths=source_relative --grpc-gateway_opt=generate_unbound_methods=true \
 		-I /usr/local/include/. \
     	-I /api/. portal.api.proto
+
+.PHONE: run-portal
+run-portal:
+	@go run cmd/server/*.go --gateway.port=8060 --internal.port=8076 --client.address=0.0.0.0 --client.port=9091

@@ -7,6 +7,7 @@ import (
 	"context"
 	"errors"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 	"time"
 )
@@ -39,7 +40,7 @@ func getPortal() models.Service {
 }
 
 func NewPortal(logger *logrus.Logger) (*Portal, error) {
-	conn, err := grpc.Dial("0.0.0.0:9091" /*+os.Getenv("PORT")*/, grpc.WithInsecure(), grpc.WithBlock())
+	conn, err := grpc.Dial(viper.GetString("client.address")+":"+viper.GetString("client.port"), grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		logger.Fatalf("\nDid not connect %v\n", err)
 	}
