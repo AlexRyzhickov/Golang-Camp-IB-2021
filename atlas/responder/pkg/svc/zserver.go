@@ -4,8 +4,6 @@ import (
 	models "atlas/responder/internal"
 	"atlas/responder/pkg/pb"
 	"context"
-	"crypto/sha1"
-	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -18,10 +16,9 @@ import (
 	dapr "github.com/dapr/dapr/pkg/proto/runtime/v1"
 	"github.com/dapr/go-sdk/service/common"
 	"github.com/golang/protobuf/ptypes/empty"
+	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 const (
@@ -95,7 +92,7 @@ func (a *Responder) GetInfo(ctx context.Context, in *pb.GetInfoRequest) (*pb.Get
 	}
 
 	if in.Service == storage {
-		id := getId(time.Now().String())
+		id := uuid.NewString()
 		if err := a.PublishMsg(ctx, id, "getInfo", nil); err != nil {
 			return nil, err
 		}
@@ -122,7 +119,7 @@ func (a *Responder) SetInfo(ctx context.Context, in *pb.SetInfoRequest) (*pb.Set
 	}
 
 	if in.Service == storage {
-		id := getId(time.Now().String())
+		id := uuid.NewString()
 		if err := a.PublishMsg(ctx, id, "setInfo", in.Value); err != nil {
 			return nil, err
 		}
@@ -144,7 +141,7 @@ func (a *Responder) GetUptime(ctx context.Context, in *pb.GetUptimeRequest) (*pb
 	}
 
 	if in.Service == storage || in.Service == responder || in.Service == portal {
-		id := getId(time.Now().String())
+		id := uuid.NewString()
 		if err := a.PublishMsg(ctx, id, "getMode", in.Service); err != nil {
 			return nil, err
 		}
@@ -169,7 +166,7 @@ func (a *Responder) GetUptime(ctx context.Context, in *pb.GetUptimeRequest) (*pb
 		}
 
 		if mode == "true" && in.Service == storage {
-			id := getId(time.Now().String())
+			id := uuid.NewString()
 			if err := a.PublishMsg(ctx, id, "getUptime", nil); err != nil {
 				return nil, err
 			}
@@ -199,7 +196,7 @@ func (a *Responder) GetRequests(ctx context.Context, in *pb.GetRequestsRequest) 
 	}
 
 	if in.Service == storage {
-		id := getId(time.Now().String())
+		id := uuid.NewString()
 		if err := a.PublishMsg(ctx, id, "getRequests", nil); err != nil {
 			return nil, err
 		}
@@ -230,7 +227,7 @@ func (a *Responder) Reset(ctx context.Context, in *pb.ResetRequest) (*pb.ResetRe
 	}
 
 	if in.Service == storage {
-		id := getId(time.Now().String())
+		id := uuid.NewString()
 		if err := a.PublishMsg(ctx, id, "reset", nil); err != nil {
 			return nil, err
 		}
@@ -252,7 +249,7 @@ func (a *Responder) GetMode(ctx context.Context, in *pb.GetModeRequest) (*pb.Get
 	}
 
 	if in.Service == "storage" || in.Service == "responder" || in.Service == "portal" {
-		id := getId(time.Now().String())
+		id := uuid.NewString()
 		if err := a.PublishMsg(ctx, id, "getMode", in.Service); err != nil {
 			return nil, err
 		}
@@ -280,7 +277,7 @@ func (a *Responder) SetMode(ctx context.Context, in *pb.SetModeRequest) (*pb.Set
 	}
 
 	if in.Service == storage || in.Service == responder || in.Service == portal {
-		id := getId(time.Now().String())
+		id := uuid.NewString()
 		if err := a.PublishMsg(ctx, id, "setMode", in.Service+"&"+strconv.FormatBool(in.Mode)); err != nil {
 			return nil, err
 		}
@@ -322,7 +319,7 @@ func (a *Responder) PublishMsg(ctx context.Context, id, command string, value in
 	data, err := json.Marshal(msg)
 
 	if err != nil {
-		return status.Error(codes.Unknown, "err")
+		return err
 	}
 
 	_, err = a.client.PublishEvent(context.Background(), &dapr.PublishEventRequest{
@@ -332,10 +329,4 @@ func (a *Responder) PublishMsg(ctx context.Context, id, command string, value in
 	})
 
 	return err
-}
-
-func getId(s string) string {
-	h := sha1.New()
-	h.Write([]byte(s))
-	return hex.EncodeToString(h.Sum(nil))
 }
