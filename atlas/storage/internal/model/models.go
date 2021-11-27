@@ -1,6 +1,9 @@
 package models
 
-import "time"
+import (
+	"sync"
+	"time"
+)
 
 type Note struct {
 	Service string `gorm:"primaryKey"`
@@ -8,7 +11,7 @@ type Note struct {
 }
 
 type Service struct {
-	ServiceName          string
+	sync.RWMutex
 	ServiceDesc          string
 	ServiceUptime        time.Time
 	ServiceCountRequests uint

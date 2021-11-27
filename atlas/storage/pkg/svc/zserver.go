@@ -67,7 +67,6 @@ func NewStoragePubSub(db *gorm.DB, logger *logrus.Logger) (*StoragePubSub, error
 
 func getStorage() models.Service {
 	return models.Service{
-		ServiceName:          "storage",
 		ServiceDesc:          "storage service desc",
 		ServiceUptime:        time.Now(),
 		ServiceCountRequests: 0,
@@ -76,7 +75,10 @@ func getStorage() models.Service {
 
 func (s *StoragePubSub) EventHandler(ctx context.Context, e *common.TopicEvent) (retry bool, err error) {
 	s.logger.Debugf("event - PubsubName: %s, Topic: %s, ID: %s, Data: %s", e.PubsubName, e.Topic, e.ID, e.Data)
+
+	s.storage.Lock()
 	s.storage.ServiceCountRequests++
+	s.storage.Unlock()
 
 	var m map[string]string
 	json.Unmarshal([]byte(e.Data.(string)), &m)
@@ -90,12 +92,19 @@ func (s *StoragePubSub) EventHandler(ctx context.Context, e *common.TopicEvent) 
 	case getInfo:
 		response = s.storage.ServiceDesc
 	case setInfo:
+		s.storage.Lock()
 		s.storage.ServiceDesc = m["Value"]
+		s.storage.Unlock()
 		response = success
 	case getRequests:
 		response = strconv.Itoa(int(s.storage.ServiceCountRequests))
 	case reset:
-		s.storage = getStorage()
+		s.storage.Lock()
+		newStorage := getStorage()
+		s.storage.ServiceCountRequests = newStorage.ServiceCountRequests
+		s.storage.ServiceUptime = newStorage.ServiceUptime
+		s.storage.ServiceDesc = newStorage.ServiceDesc
+		s.storage.Unlock()
 		response = success
 	case getMode:
 		serviceName := m["Value"]
