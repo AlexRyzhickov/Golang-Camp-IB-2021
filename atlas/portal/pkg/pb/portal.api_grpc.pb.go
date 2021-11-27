@@ -4,7 +4,6 @@ package pb
 
 import (
 	context "context"
-	empty "github.com/golang/protobuf/ptypes/empty"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -19,7 +18,6 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PortalClient interface {
-	GetVersion(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*VersionResponse, error)
 	GetInfo(ctx context.Context, in *GetInfoRequest, opts ...grpc.CallOption) (*GetInfoResponse, error)
 	SetInfo(ctx context.Context, in *SetInfoRequest, opts ...grpc.CallOption) (*SetInfoResponse, error)
 	GetUptime(ctx context.Context, in *GetUptimeRequest, opts ...grpc.CallOption) (*GetUptimeResponse, error)
@@ -35,15 +33,6 @@ type portalClient struct {
 
 func NewPortalClient(cc grpc.ClientConnInterface) PortalClient {
 	return &portalClient{cc}
-}
-
-func (c *portalClient) GetVersion(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*VersionResponse, error) {
-	out := new(VersionResponse)
-	err := c.cc.Invoke(ctx, "/portal.pb.Portal/GetVersion", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
 }
 
 func (c *portalClient) GetInfo(ctx context.Context, in *GetInfoRequest, opts ...grpc.CallOption) (*GetInfoResponse, error) {
@@ -113,7 +102,6 @@ func (c *portalClient) SetMode(ctx context.Context, in *SetModeRequest, opts ...
 // All implementations must embed UnimplementedPortalServer
 // for forward compatibility
 type PortalServer interface {
-	GetVersion(context.Context, *empty.Empty) (*VersionResponse, error)
 	GetInfo(context.Context, *GetInfoRequest) (*GetInfoResponse, error)
 	SetInfo(context.Context, *SetInfoRequest) (*SetInfoResponse, error)
 	GetUptime(context.Context, *GetUptimeRequest) (*GetUptimeResponse, error)
@@ -128,9 +116,6 @@ type PortalServer interface {
 type UnimplementedPortalServer struct {
 }
 
-func (UnimplementedPortalServer) GetVersion(context.Context, *empty.Empty) (*VersionResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetVersion not implemented")
-}
 func (UnimplementedPortalServer) GetInfo(context.Context, *GetInfoRequest) (*GetInfoResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetInfo not implemented")
 }
@@ -163,24 +148,6 @@ type UnsafePortalServer interface {
 
 func RegisterPortalServer(s grpc.ServiceRegistrar, srv PortalServer) {
 	s.RegisterService(&Portal_ServiceDesc, srv)
-}
-
-func _Portal_GetVersion_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(empty.Empty)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PortalServer).GetVersion(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/portal.pb.Portal/GetVersion",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PortalServer).GetVersion(ctx, req.(*empty.Empty))
-	}
-	return interceptor(ctx, in, info, handler)
 }
 
 func _Portal_GetInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -316,10 +283,6 @@ var Portal_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "portal.pb.Portal",
 	HandlerType: (*PortalServer)(nil),
 	Methods: []grpc.MethodDesc{
-		{
-			MethodName: "GetVersion",
-			Handler:    _Portal_GetVersion_Handler,
-		},
 		{
 			MethodName: "GetInfo",
 			Handler:    _Portal_GetInfo_Handler,

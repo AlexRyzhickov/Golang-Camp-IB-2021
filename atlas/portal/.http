@@ -1,7 +1,4 @@
 ###
-GET http://localhost:8060/portal/v1/version
-
-###
 POST http://localhost:8060/portal/v1/info
 Content-Type: application/json
 

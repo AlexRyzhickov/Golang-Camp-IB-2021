@@ -6,15 +6,12 @@ import (
 	responderpb "atlas/responder/pkg/pb"
 	"context"
 	"errors"
-	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"time"
 )
 
 const (
-	// version is the current version of the service
-	version            = "0.0.1"
 	invalidServiceName = "invalid service name"
 	emptyRequest       = "empty Request"
 	success            = "success"
@@ -54,10 +51,6 @@ func NewPortal(logger *logrus.Logger) (*Portal, error) {
 		logger: logger,
 		portal: getPortal(),
 	}, nil
-}
-
-func (p *Portal) GetVersion(context.Context, *empty.Empty) (*pb.VersionResponse, error) {
-	return &pb.VersionResponse{Version: version}, nil
 }
 
 func (p *Portal) GetInfo(ctx context.Context, in *pb.GetInfoRequest) (*pb.GetInfoResponse, error) {
