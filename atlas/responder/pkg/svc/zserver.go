@@ -356,7 +356,7 @@ func (r *Responder) SetMode(ctx context.Context, in *pb.SetModeRequest) (*pb.Set
 }
 
 func (r *Responder) EventHandler(ctx context.Context, e *common.TopicEvent) (retry bool, err error) {
-	r.logger.Printf("event - PubsubName: %s, Topic: %s, ID: %s, Data: %s", e.PubsubName, e.Topic, e.ID, e.Data)
+	r.logger.Debugf("event - PubsubName: %s, Topic: %s, ID: %s, Data: %s", e.PubsubName, e.Topic, e.ID, e.Data)
 
 	var m map[string]string
 	err = json.Unmarshal([]byte(e.Data.(string)), &m)
