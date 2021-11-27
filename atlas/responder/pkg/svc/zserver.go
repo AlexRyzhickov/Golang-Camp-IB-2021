@@ -7,7 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"os"
+	"github.com/spf13/viper"
 	"strconv"
 	"sync"
 	"time"
@@ -26,7 +26,6 @@ const (
 	invalidServiceName = "invalid service name"
 	emptyRequest       = "empty Request"
 	success            = "success"
-	errorMsg           = "error"
 	errorMissingResp   = "missing repository response error"
 	hiddenUptimeMsg    = "uptime is hidden, mode = false"
 	pubTopic           = "neworder"
@@ -56,12 +55,12 @@ func getResponder() models.Service {
 
 func NewResponder(logger *logrus.Logger, s *sync.Map) (*Responder, error) {
 	sub := &common.Subscription{
-		PubsubName: "messages",
+		PubsubName: viper.GetString("dapr.pubsub.name"),
 		Topic:      subTopic,
 		Route:      route,
 	}
 
-	conn, err := grpc.Dial(fmt.Sprintf("0.0.0.0:%s", os.Getenv("DAPR_GRPC_PORT")), grpc.WithInsecure())
+	conn, err := grpc.Dial(fmt.Sprintf("0.0.0.0:%s", viper.GetString("dapr.grpcPort")), grpc.WithInsecure())
 	if err != nil {
 		return nil, fmt.Errorf("failed to open atlas pubsub connection: %v", err)
 	}
@@ -306,7 +305,7 @@ func (r *Responder) PublishMsg(ctx context.Context, id, command string, value in
 	_, err = r.client.PublishEvent(context.Background(), &dapr.PublishEventRequest{
 		Topic:      pubTopic,
 		Data:       data,
-		PubsubName: "messages",
+		PubsubName: r.Sub.PubsubName,
 	})
 
 	return err

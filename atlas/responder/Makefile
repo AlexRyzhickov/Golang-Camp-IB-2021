@@ -25,7 +25,16 @@ gen-proto: docker-build-generator
 
 .PHONY: run-responder
 run-responder:
-	@export DAPR_PUBSUB_NAME=messages && export DAPR_GRPC_PORT=43011 && go run cmd/server/*.go
+	@go run cmd/server/*.go \
+		--server.port=9091 \
+		--gateway.port=8082 \
+		--internal.port=8083 \
+		--dapr.appPort=8088 \
+		--dapr.grpcPort=43011 \
+		--dapr.pubsub.name=messages
+#		--dapr.subscribe.topic=neworder2 \
+#		--dapr.publish.topic=neworder \
+
 
 .PHONY: run-dapr
 run-dapr:

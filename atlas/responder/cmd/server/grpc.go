@@ -58,7 +58,7 @@ func NewGRPCServer(logger *logrus.Logger) (*grpc.Server, error) {
 	reflection.Register(grpcServer)
 
 	go func() {
-		s := dapr.NewService(":8088")
+		s := dapr.NewService(":" + viper.GetString("dapr.appPort"))
 
 		if err := s.AddTopicEventHandler(srv.Sub, srv.EventHandler); err != nil {
 			logger.Fatalf("error adding topic subscription: %v", err)
