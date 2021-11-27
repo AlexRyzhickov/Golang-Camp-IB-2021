@@ -48,7 +48,6 @@ type Responder struct {
 
 func getResponder() models.Service {
 	return models.Service{
-		ServiceName:          "responder",
 		ServiceDesc:          "responder service desc",
 		ServiceUptime:        time.Now(),
 		ServiceCountRequests: 0,
@@ -86,7 +85,9 @@ func (r *Responder) GetInfo(ctx context.Context, in *pb.GetInfoRequest) (*pb.Get
 	}
 
 	if in.Service == responder {
+		r.responder.Lock()
 		r.responder.ServiceCountRequests++
+		r.responder.Unlock()
 		return &pb.GetInfoResponse{Value: r.responder.ServiceDesc}, nil
 	}
 
@@ -121,7 +122,10 @@ func (r *Responder) SetInfo(ctx context.Context, in *pb.SetInfoRequest) (*pb.Set
 	}
 
 	if in.Service == responder {
+		r.responder.Lock()
+		r.responder.ServiceCountRequests++
 		r.responder.ServiceDesc = in.Value
+		r.responder.Unlock()
 		return &pb.SetInfoResponse{Msg: success}, nil
 	}
 
@@ -153,6 +157,12 @@ func (r *Responder) SetInfo(ctx context.Context, in *pb.SetInfoRequest) (*pb.Set
 func (r *Responder) GetUptime(ctx context.Context, in *pb.GetUptimeRequest) (*pb.GetUptimeResponse, error) {
 	if in == nil || in.Service == "" {
 		return nil, errors.New(emptyRequest)
+	}
+
+	if in.Service == responder {
+		r.responder.Lock()
+		r.responder.ServiceCountRequests++
+		r.responder.Unlock()
 	}
 
 	if in.Service == storage || in.Service == responder || in.Service == portal {
@@ -222,7 +232,9 @@ func (r *Responder) GetRequests(ctx context.Context, in *pb.GetRequestsRequest) 
 	}
 
 	if in.Service == responder {
+		r.responder.Lock()
 		r.responder.ServiceCountRequests++
+		r.responder.Unlock()
 		return &pb.GetRequestsResponse{Value: int32(int(r.responder.ServiceCountRequests))}, nil
 	}
 
@@ -262,7 +274,12 @@ func (r *Responder) Reset(ctx context.Context, in *pb.ResetRequest) (*pb.ResetRe
 	}
 
 	if in.Service == responder {
-		r.responder = getResponder()
+		r.responder.Lock()
+		newResponder := getResponder()
+		r.responder.ServiceCountRequests = newResponder.ServiceCountRequests
+		r.responder.ServiceDesc = newResponder.ServiceDesc
+		r.responder.ServiceUptime = newResponder.ServiceUptime
+		r.responder.Unlock()
 		return &pb.ResetResponse{Msg: success}, nil
 	}
 
@@ -294,6 +311,12 @@ func (r *Responder) Reset(ctx context.Context, in *pb.ResetRequest) (*pb.ResetRe
 func (r *Responder) GetMode(ctx context.Context, in *pb.GetModeRequest) (*pb.GetModeResponse, error) {
 	if in == nil || in.Service == "" {
 		return nil, errors.New(emptyRequest)
+	}
+
+	if in.Service == responder {
+		r.responder.Lock()
+		r.responder.ServiceCountRequests++
+		r.responder.Unlock()
 	}
 
 	if in.Service == "storage" || in.Service == "responder" || in.Service == "portal" {
@@ -328,6 +351,12 @@ func (r *Responder) GetMode(ctx context.Context, in *pb.GetModeRequest) (*pb.Get
 func (r *Responder) SetMode(ctx context.Context, in *pb.SetModeRequest) (*pb.SetModeResponse, error) {
 	if in == nil || in.Service == "" {
 		return nil, errors.New(emptyRequest)
+	}
+
+	if in.Service == responder {
+		r.responder.Lock()
+		r.responder.ServiceCountRequests++
+		r.responder.Unlock()
 	}
 
 	if in.Service == storage || in.Service == responder || in.Service == portal {
@@ -369,8 +398,6 @@ func (r *Responder) EventHandler(ctx context.Context, e *common.TopicEvent) (ret
 	if ok {
 		signal.(chan interface{}) <- m
 	}
-
-	//a.responses.Store(m["Id"], m)
 
 	return false, nil
 }

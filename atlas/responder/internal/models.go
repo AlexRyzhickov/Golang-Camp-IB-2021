@@ -1,9 +1,12 @@
 package models
 
-import "time"
+import (
+	"sync"
+	"time"
+)
 
 type Service struct {
-	ServiceName          string
+	sync.RWMutex
 	ServiceDesc          string
 	ServiceUptime        time.Time
 	ServiceCountRequests uint
