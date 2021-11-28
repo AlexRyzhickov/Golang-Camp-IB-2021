@@ -73,7 +73,7 @@ const (
 
 	// External
 	defaultGrpcClientAddress = "0.0.0.0"
-	defaultGrpcClientPort    = "8080"
+	defaultGrpcClientPort    = "8082"
 )
 
 var (
