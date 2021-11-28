@@ -1,0 +1,77 @@
+###
+GET http://localhost:8082/responder/v1/version
+
+###
+POST http://localhost:8082/responder/v1/getInfo
+Content-Type: application/json
+
+{
+  "service": "responder"
+}
+
+###
+POST http://localhost:8082/responder/v1/setInfo
+Content-Type: application/json
+
+{
+  "service": "responder",
+  "value": "responder service description"
+}
+
+###
+POST http://localhost:8082/responder/v1/getInfo
+Content-Type: application/json
+
+{
+  "service": "storage"
+}
+
+###
+POST http://localhost:8082/responder/v1/setInfo
+Content-Type: application/json
+
+{
+  "service": "storage",
+  "value": "storage service desc"
+}
+
+###
+POST http://localhost:8082/responder/v1/getRequests
+Content-Type: application/json
+
+{
+  "service": "responder"
+}
+
+###
+POST http://localhost:8082/responder/v1/reset
+Content-Type: application/json
+
+{
+  "service": "responder"
+}
+
+###
+POST http://localhost:8082/responder/v1/getMode
+Content-Type: application/json
+
+{
+  "service": "storage"
+}
+
+###
+POST http://localhost:8082/responder/v1/setMode
+Content-Type: application/json
+
+{
+  "service": "storage",
+  "mode": true
+}
+
+###
+POST http://localhost:8082/responder/v1/getUptime
+Content-Type: application/json
+
+{
+  "service": "storage"
+}

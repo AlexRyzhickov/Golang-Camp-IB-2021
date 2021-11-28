@@ -1,0 +1,126 @@
+syntax = "proto3";
+package pb;
+option go_package = "atlas/responder/pkg/pb";
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+service Responder {
+  rpc GetVersion (google.protobuf.Empty) returns (VersionResponse) {
+    option (google.api.http) = {
+      get: "/version"
+    };
+  }
+
+  rpc GetInfo  (GetInfoRequest) returns (GetInfoResponse) {
+    option (google.api.http) = {
+      post: "/getInfo"
+      body: "*"
+    };
+  }
+
+  rpc SetInfo  (SetInfoRequest) returns (SetInfoResponse) {
+    option (google.api.http) = {
+      post: "/setInfo"
+      body: "*"
+    };
+  }
+
+  rpc GetUptime (GetUptimeRequest) returns (GetUptimeResponse) {
+    option (google.api.http) = {
+      post: "/getUptime"
+      body: "*"
+    };
+  }
+
+  rpc GetRequests (GetRequestsRequest) returns (GetRequestsResponse) {
+    option (google.api.http) = {
+      post: "/getRequests"
+      body: "*"
+    };
+  }
+
+  rpc Reset (ResetRequest) returns (ResetResponse) {
+    option (google.api.http) = {
+      post: "/reset"
+      body: "*"
+    };
+  }
+
+  rpc GetMode (GetModeRequest) returns (GetModeResponse) {
+    option (google.api.http) = {
+      post: "/getMode"
+      body: "*"
+    };
+  }
+
+  rpc SetMode (SetModeRequest) returns (SetModeResponse) {
+    option (google.api.http) = {
+      post: "/setMode"
+      body: "*"
+    };
+  }
+
+}
+
+message VersionResponse {
+  string version = 1;
+}
+
+message SetInfoRequest {
+  string service = 1;
+  string value = 2;
+}
+
+message SetInfoResponse {
+  string msg = 1;
+}
+
+message GetInfoRequest {
+  string service = 1;
+}
+
+message GetInfoResponse {
+  string value = 1;
+}
+
+message GetUptimeRequest {
+  string service = 1;
+}
+
+message GetUptimeResponse {
+  string value = 1;
+}
+
+message GetRequestsRequest {
+  string service = 1;
+}
+
+message GetRequestsResponse {
+  int32 value = 1;
+}
+
+message ResetRequest {
+  string service = 1;
+}
+
+message ResetResponse {
+  string msg = 1;
+}
+
+message GetModeRequest{
+  string service = 1;
+}
+
+message GetModeResponse  {
+  string mode = 1;
+}
+
+message SetModeRequest{
+  string service = 1;
+  bool mode = 2;
+}
+
+message SetModeResponse  {
+  string msg = 1;
+}

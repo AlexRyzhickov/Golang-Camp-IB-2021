@@ -1,0 +1,74 @@
+###
+POST http://localhost:8060/portal/v1/info
+Content-Type: application/json
+
+{
+  "service": "responder"
+}
+
+###
+POST http://localhost:8060/portal/v1/setInfo
+Content-Type: application/json
+
+{
+  "service": "responder",
+  "value": "responder service description"
+}
+
+###
+POST http://localhost:8060/portal/v1/info
+Content-Type: application/json
+
+{
+  "service": "storage"
+}
+
+###
+POST http://localhost:8060/portal/v1/setInfo
+Content-Type: application/json
+
+{
+  "service": "storage",
+  "value": "storage service desc"
+}
+
+###
+POST http://localhost:8060/portal/v1/requests
+Content-Type: application/json
+
+{
+  "service": "responder"
+}
+
+###
+POST http://localhost:8060/portal/v1/reset
+Content-Type: application/json
+
+{
+  "service": "responder"
+}
+
+###
+POST http://localhost:8060/portal/v1/mode
+Content-Type: application/json
+
+{
+  "service": "storage"
+}
+
+###
+POST http://localhost:8060/portal/v1/setMode
+Content-Type: application/json
+
+{
+  "service": "storage",
+  "mode": true
+}
+
+###
+POST http://localhost:8060/portal/v1/uptime
+Content-Type: application/json
+
+{
+  "service": "storage"
+}
