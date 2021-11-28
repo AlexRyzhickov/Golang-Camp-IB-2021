@@ -8,11 +8,11 @@ import (
 	dapr "github.com/dapr/dapr/pkg/proto/runtime/v1"
 	"github.com/dapr/go-sdk/service/common"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
-	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -44,12 +44,12 @@ type StoragePubSub struct {
 
 func NewStoragePubSub(db *gorm.DB, logger *logrus.Logger) (*StoragePubSub, error) {
 	sub := &common.Subscription{
-		PubsubName: "messages",
+		PubsubName: viper.GetString("dapr.pubsub.name"),
 		Topic:      subTopic,
 		Route:      route,
 	}
 
-	conn, err := grpc.Dial(fmt.Sprintf("0.0.0.0:%s", os.Getenv("DAPR_GRPC_PORT")), grpc.WithInsecure())
+	conn, err := grpc.Dial(fmt.Sprintf("0.0.0.0:%s", viper.GetString("dapr.grpcPort")), grpc.WithInsecure())
 	if err != nil {
 		return nil, fmt.Errorf("failed to open atlas pubsub connection: %v", err)
 	}

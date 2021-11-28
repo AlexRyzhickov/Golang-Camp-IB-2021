@@ -91,7 +91,7 @@ func ServeExternal(logger *logrus.Logger) error {
 		logger.Fatalln(err)
 	}
 
-	service := daprd.NewService(":8080")
+	service := daprd.NewService(":" + viper.GetString("dapr.appPort"))
 
 	if err := service.AddTopicEventHandler(s.Sub, s.EventHandler); err != nil {
 		logger.Fatalf("error adding topic subscription: %v", err)
